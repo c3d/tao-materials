@@ -156,7 +156,7 @@ fresnel_shader ->
         fragment_shader <<
 
             // Material parameters
-            uniform float Eta;
+            uniform float Eta; // Ratio of indices of refraction
             uniform float ratio;
             uniform float roughness;
             uniform vec4 baseColor;
@@ -208,7 +208,7 @@ glass ->
     /**
     * Define a sort of glass material.
     **/
-    fresnel_material 1.0, 1.0, 1.0, 0.1, 1.53, 0.02
+    fresnel_material 1.0, 1.0, 1.0, 0.1, 1.12, 0.02
 
 // -------------------------------------------------------------------------------------------------------------------
 //   BRONZE MATERIAL
