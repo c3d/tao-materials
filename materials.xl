@@ -1,0 +1,301 @@
+// Materials module definition
+//
+// This module defines the materials primitives
+//
+// Copyright 2010-2011 Taodyne
+
+module_description
+    id "a5ae8295-dbe5-416d-abca-8fc4551f36c5"
+    name "Materials"
+    import_name "Materials"
+    description "A module to add different materials in a scene."
+    author "Taodyne SAS"
+    website "http://www.taodyne.com"
+    version "1.0"
+
+module_description "fr",
+    name "Filtrage"
+    description "Permet d'appliquer différents matériaux sur des objets présent dans une scène."
+
+// -------------------------------------------------------------------------------------------------------------------
+//   PLASTIC MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+// Plastic color
+PLASTIC_R -> 1.0
+PLASTIC_R := 1.0
+PLASTIC_G -> 1.0
+PLASTIC_G := 1.0
+PLASTIC_B -> 1.0
+PLASTIC_B := 1.0
+
+plastic r:real, g:real, b:real ->
+    /**
+    * Apply plastic material.
+    **/
+    PLASTIC_R := r
+    PLASTIC_G := g
+    PLASTIC_B := b
+    plastic_shader
+
+plastic_shader ->
+    /**
+    * Define plastic shader.
+    **/
+    shader_program
+        vertex_shader <<
+            varying float ratio;
+            uniform vec3 camera;
+            void main()
+            {
+               gl_Position = ftransform();
+
+               // World-space lighting
+               vec3 worldPos = vec3(gl_ModelViewMatrix * gl_Vertex);
+               vec3 normal   = normalize (gl_NormalMatrix * gl_Normal);
+               vec3 eyePos   = normalize(camera - worldPos);
+
+               ratio = 0.5 * (1.0 + dot(eyePos, normal));
+            }
+        >>
+        fragment_shader <<
+            varying float ratio;
+            uniform vec3 color;
+            void main()
+            {
+                gl_FragColor = vec4(ratio * color, 1.0);
+            }
+        >>
+    shader_set color  := (PLASTIC_R; PLASTIC_G; PLASTIC_B)
+
+    //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
+    shader_set camera := (camera_position at 1; camera_position at 2; camera_position at 3)
+
+// -------------------------------------------------------------------------------------------------------------------
+//   FRESNEL MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+// Material roughness
+FRESNEL_ROUGHNESS -> 1.0
+FRESNEL_ROUGHNESS := 1.0
+
+// Indice of refraction
+FRESNEL_REFRACTION -> 1.0
+FRESNEL_REFRACTION := 1.0
+
+// Material color
+FRESNEL_R -> 1.0
+FRESNEL_R := 1.0
+FRESNEL_G -> 1.0
+FRESNEL_G := 1.0
+FRESNEL_B -> 1.0
+FRESNEL_B := 1.0
+FRESNEL_A -> 0.5
+FRESNEL_A := 0.5
+
+fresnel_material r:real, g:real, b:real, a:real, n:real, roughness:real ->
+    /**
+    * Apply a fresnel material.
+    **/
+    FRESNEL_R := r
+    FRESNEL_G := g
+    FRESNEL_B := b
+    FRESNEL_A := a
+    FRESNEL_REFRACTION := n
+    FRESNEL_ROUGHNESS  := roughness
+    fresnel_shader
+
+fresnel_shader ->
+    /**
+    * Define shader for fresnel material.
+    **/
+    shader_program
+        shader_log
+        vertex_shader <<
+
+            // Get linear part of a matrix 4x4
+            mat3 linearPart( mat4 m )
+            {
+                mat3 result;
+
+                // First column
+                result[0][0] = m[0][0];
+                result[0][1] = m[0][1];
+                result[0][2] = m[0][2];
+
+                // Second column
+                result[1][0] = m[1][0];
+                result[1][1] = m[1][1];
+                result[1][2] = m[1][2];
+
+                // Third column
+                result[2][0] = m[2][0];
+                result[2][1] = m[2][1];
+                result[2][2] = m[2][2];
+
+                return result;
+            }
+
+            // Scene parameters
+            uniform vec3 camera;
+            uniform mat4 modelMatrix;
+
+            varying vec3 normal;
+            varying vec3 viewDir;
+
+            void main()
+            {
+               gl_Position = ftransform();
+
+               // World-space lighting
+               vec3 eyePos   = vec3(modelMatrix * gl_Vertex);
+               normal        = normalize(linearPart(modelMatrix) * gl_Normal);
+               viewDir       = normalize(eyePos - camera);
+            }
+        >>
+        fragment_shader <<
+
+            // Material parameters
+            uniform float Eta;
+            uniform float ratio;
+            uniform float roughness;
+            uniform vec4 baseColor;
+            uniform samplerCube environmentMap;
+
+            varying vec3 normal;
+            varying vec3 viewDir;
+
+            const float roughness_ratio = 50.0;
+
+            void main()
+            {
+                vec3 reflectDir, refractDir;
+                reflectDir = normalize(reflect(viewDir, normal));
+                refractDir = normalize(refract(viewDir, normal, Eta));
+
+                vec3 reflectColor, refractColor;
+                reflectColor = textureCube(environmentMap, reflectDir).xyz;
+                refractColor = textureCube(environmentMap, refractDir).xyz;
+
+                // Compute fresnel ratio
+                float fresnel = pow(1.0 - (dot(-viewDir, normal)), 1/(roughness * roughness_ratio));
+
+                // Compute final color
+                vec3 color      = mix(refractColor, reflectColor, fresnel);
+                vec3 finalColor = mix(color, baseColor, baseColor.a);
+
+                gl_FragColor  = vec4( finalColor, 1.0);
+            }
+        >>
+
+    shader_set Eta            := FRESNEL_REFRACTION
+    shader_set baseColor      := (FRESNEL_R; FRESNEL_G; FRESNEL_B; FRESNEL_A)
+    shader_set roughness      := FRESNEL_ROUGHNESS
+    shader_set environmentMap := texture_unit
+
+    //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
+    shader_set camera         := (camera_position at 1; camera_position at 2; camera_position at 3)
+    shader_set modelMatrix    := (model_matrix at 1;  model_matrix at 2;  model_matrix at 3;  model_matrix at 4;
+                                  model_matrix at 5;  model_matrix at 6;  model_matrix at 7;  model_matrix at 8;
+                                  model_matrix at 9;  model_matrix at 10; model_matrix at 11; model_matrix at 12;
+                                  model_matrix at 13; model_matrix at 14; model_matrix at 15; model_matrix at 16)
+
+// -------------------------------------------------------------------------------------------------------------------
+//   GLASS MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+glass ->
+    /**
+    * Define a sort of glass material.
+    **/
+    fresnel_material 1.0, 1.0, 1.0, 0.1, 1.53, 0.02
+
+// -------------------------------------------------------------------------------------------------------------------
+//   BRONZE MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+bronze ->
+    /**
+    * Define a sort of bronze material.
+    **/
+    fresnel_material 0.34, 0.24, 0.1, 0.93, 1.18, 1.0
+
+// -------------------------------------------------------------------------------------------------------------------
+//   SILVER MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+silver ->
+    /**
+    * Define a sort of silver material.
+    **/
+    fresnel_material 0.807, 0.807, 0.807, 0.4, 0.8, 1.0
+
+// -------------------------------------------------------------------------------------------------------------------
+//   GOLD MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+gold ->
+    /**
+    * Define a sort of gold material.
+    **/
+    fresnel_material 0.65, 0.607, 0.031, 0.7, 0.47, 1.0
+
+// -------------------------------------------------------------------------------------------------------------------
+//   IRON MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+iron ->
+    /**
+    * Define a sort of iron material.
+    **/
+    fresnel_material 0.43, 0.376, 0.364, 0.6, 2.95, 1.0
+
+// -------------------------------------------------------------------------------------------------------------------
+//   CHROMIUM MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+chromium  ->
+    /**
+    * Define a sort of chrome material.
+    **/
+    fresnel_material 0.8, 0.8, 0.8, 0.1, 2.97, 1.0
+
+// -------------------------------------------------------------------------------------------------------------------
+//   WATER MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+water ->
+    /**
+    * Define a sort of water material.
+    **/
+    fresnel_material 0.35, 0.5, 0.5, 0.5, 1.325, 0.01
+
+// -------------------------------------------------------------------------------------------------------------------
+//   EMERALD MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+emerald ->
+    /**
+    * Define a sort of emerald material.
+    **/
+    fresnel_material 0.0, 0.6, 0.1, 0.65, 1.56, 0.03
+
+// -------------------------------------------------------------------------------------------------------------------
+//   RUBY MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+ruby ->
+    /**
+    * Define a sort of ruby material.
+    **/
+    fresnel_material 0.6, 0.1, 0.1, 0.7, 1.757, 0.03
+
+// -------------------------------------------------------------------------------------------------------------------
+//   DIAMOND MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+diamond ->
+    /**
+    * Define a sort of diamon material.
+    **/
+    fresnel_material 1.0, 1.0, 1.0, 0.1, 2.458, 0.03
