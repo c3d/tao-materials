@@ -7,6 +7,9 @@
  * This module allows you to define and apply some useful materials on your different objects.
  *
  *
+ * @note Materials defined in this module are adapted for a basic usage.
+ * @note For more complex scene, it is recommended to define directly your own materials
+ * by using combinaisons of available functions in this module and in Tao.
  *
  * @{
  */
