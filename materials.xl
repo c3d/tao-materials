@@ -148,7 +148,7 @@ fresnel_shader ->
                gl_Position = ftransform();
 
                // World-space lighting
-               vec3 eyePos   = vec3(modelMatrix * gl_Vertex);
+               vec3 eyePos   = vec3(gl_TextureMatrix[0] * modelMatrix * gl_Vertex);
                normal        = normalize(linearPart(modelMatrix) * gl_Normal);
                viewDir       = normalize(eyePos - camera);
             }
