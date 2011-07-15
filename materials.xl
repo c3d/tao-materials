@@ -178,7 +178,7 @@ fresnel_shader ->
                 refractColor = textureCube(environmentMap, refractDir).xyz;
 
                 // Compute fresnel ratio
-                float fresnel = pow(1.0 - (dot(-viewDir, normal)), 1/(roughness * roughness_ratio));
+                float fresnel = pow(1.0 - (dot(-viewDir, normal)), 1.0 / (roughness * roughness_ratio));
 
                 // Compute final color
                 vec3 color      = mix(refractColor, reflectColor, fresnel);
@@ -290,12 +290,4 @@ ruby ->
     **/
     fresnel_material 0.6, 0.1, 0.1, 0.7, 1.757, 0.03
 
-// -------------------------------------------------------------------------------------------------------------------
-//   DIAMOND MATERIAL
-// -------------------------------------------------------------------------------------------------------------------
 
-diamond ->
-    /**
-    * Define a sort of diamon material.
-    **/
-    fresnel_material 1.0, 1.0, 1.0, 0.1, 2.458, 0.03

@@ -41,21 +41,21 @@ plastic(r:real, g:real, b:real);
  * @attention This material has to be apply just before the choosen object in order to be subject correctly to all its transformations.
  *
  * An example of use of this effect is described below
- @code
- // Define cube map to generate reflection
- cube_map
-    cube_face 0, "right.png"
-    cube_face 1, "face.png"
-    cube_face 2, "top.png"
-    cube_face 3, "bottom.png"
-    cube_face 4, "front.png"
-    cube_face 5, "back.png"
- rotatex time * 20
- rotatey 90
- // Apply effect just before drawing object
- fresnel_material 1.0, 1.0, 1.0, 0.1, 1.12, 0.01
- sphere 0, 0, 0, 500, 500, 500, 50, 50
- @endcode
+@code
+// Define cube map to generate reflection
+cube_map
+   cube_map_face 0, "right.png"
+   cube_map_face 1, "face.png"
+   cube_map_face 2, "top.png"
+   cube_map_face 3, "bottom.png"
+   cube_map_face 4, "front.png"
+   cube_map_face 5, "back.png"
+rotatex time * 20
+rotatey 90
+// Apply effect just before drawing object
+fresnel_material 1.0, 1.0, 1.0, 0.1, 1.12, 0.01
+sphere 0, 0, 0, 500, 500, 500, 50, 50
+@endcode
  *
  * @note This material act as a simple texture.
  *
@@ -71,9 +71,9 @@ fresnel_material(r:real, g:real, b:real, a:real, n:real, roughness:real);
  * @attention This material is subject to the same remarks than @ref fresnel_material in order to be apply correctly on an object.
  *
  * @note It can be also define with
-  @code
-  fresnel_material 0.65, 0.607, 0.031, 0.7, 0.47, 1.0
-  @endcode
+@code
+fresnel_material 0.65, 0.607, 0.031, 0.7, 0.47, 1.0
+@endcode
  *
  */
 gold();
@@ -86,9 +86,9 @@ gold();
  * @attention This material is subject to the same remarks than @ref fresnel_material in order to be apply correctly on an object.
  *
  * @note It can be also define with
- @code
- fresnel_material 0.807, 0.807, 0.807, 0.4, 0.8, 1.0
- @endcode
+@code
+fresnel_material 0.807, 0.807, 0.807, 0.4, 0.8, 1.0
+@endcode
  *
  */
 silver();
@@ -101,9 +101,9 @@ silver();
  * @attention This material is subject to the same remarks than @ref fresnel_material in order to be apply correctly on an object.
  *
  * @note It can be also define with
- @code
- fresnel_material 0.34, 0.24, 0.1, 0.93, 1.18, 1.0
- @endcode
+@code
+fresnel_material 0.34, 0.24, 0.1, 0.93, 1.18, 1.0
+@endcode
  *
  */
 bronze();
@@ -116,9 +116,9 @@ bronze();
  * @attention This material is subject to the same remarks than @ref fresnel_material in order to be apply correctly on an object.
  *
  * @note It can be also define with
- @code
- fresnel_material 0.43, 0.376, 0.364, 0.6, 2.95, 1.0
- @endcode
+@code
+fresnel_material 0.43, 0.376, 0.364, 0.6, 2.95, 1.0
+@endcode
  *
  */
 iron();
@@ -131,9 +131,9 @@ iron();
  * @attention This material is subject to the same remarks than @ref fresnel_material in order to be apply correctly on an object.
  *
  * @note It can be also define with
- @code
- fresnel_material 0.8, 0.8, 0.8, 0.1, 2.97, 1.0
- @endcode
+@code
+fresnel_material 0.8, 0.8, 0.8, 0.1, 2.97, 1.0
+@endcode
  *
  */
 chromium();
@@ -146,9 +146,9 @@ chromium();
  * @attention This material is subject to the same remarks than @ref fresnel_material in order to be apply correctly on an object.
  *
  * @note It can be also define with
- @code
- fresnel_material 0.0, 0.6, 0.1, 0.65, 1.56, 0.03
- @endcode
+@code
+fresnel_material 0.0, 0.6, 0.1, 0.65, 1.56, 0.03
+@endcode
  *
  */
 emerald();
@@ -161,9 +161,9 @@ emerald();
  * @attention This material is subject to the same remarks than @ref fresnel_material in order to be apply correctly on an object.
  *
  * @note It can be also define with
- @code
- fresnel_material 0.6, 0.1, 0.1, 0.7, 1.757, 0.03
- @endcode
+@code
+fresnel_material 0.6, 0.1, 0.1, 0.7, 1.757, 0.03
+@endcode
  *
  */
 ruby();
@@ -176,9 +176,9 @@ ruby();
  * @attention This material is subject to the same remarks than @ref fresnel_material in order to be apply correctly on an object.
  *
  * @note It can be also define with
- @code
- fresnel_material 1.0, 1.0, 1.0, 0.1, 2.458, 0.03
- @endcode
+@code
+fresnel_material 1.0, 1.0, 1.0, 0.1, 2.458, 0.03
+@endcode
  *
  */
 diamond();
@@ -191,9 +191,9 @@ diamond();
  * @attention This material is subject to the same remarks than @ref fresnel_material in order to be apply correctly on an object.
  *
  * @note It can be also define with
- @code
- fresnel_material 1.0, 1.0, 1.0, 0.1, 1.12, 0.01
- @endcode
+@code
+fresnel_material 1.0, 1.0, 1.0, 0.1, 1.12, 0.01
+@endcode
  *
  */
 glass();
@@ -206,9 +206,9 @@ glass();
  * @attention This material is subject to the same remarks than @ref fresnel_material to be apply correctly on an object.
  *
  * @note It can be also define with
- @code
- fresnel_material 0.35, 0.5, 0.5, 0.5, 1.325, 0.01
- @endcode
+@code
+fresnel_material 0.35, 0.5, 0.5, 0.5, 1.325, 0.01
+@endcode
  *
  */
 water();
