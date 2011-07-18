@@ -182,7 +182,7 @@ fresnel_shader ->
 
                 // Compute final color
                 vec3 color      = mix(refractColor, reflectColor, fresnel);
-                vec3 finalColor = mix(color, baseColor, baseColor.a);
+                vec3 finalColor = mix(color, baseColor.rgb, baseColor.a);
 
                 gl_FragColor  = vec4( finalColor, 1.0);
             }
