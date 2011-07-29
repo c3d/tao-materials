@@ -112,44 +112,35 @@ fresnel_shader ->
     shader_program
         shader_log
         vertex_shader <<
-
-            // Get linear part of a matrix 4x4
-            mat3 linearPart( mat4 m )
-            {
-                mat3 result;
-
-                // First column
-                result[0][0] = m[0][0];
-                result[0][1] = m[0][1];
-                result[0][2] = m[0][2];
-
-                // Second column
-                result[1][0] = m[1][0];
-                result[1][1] = m[1][1];
-                result[1][2] = m[1][2];
-
-                // Third column
-                result[2][0] = m[2][0];
-                result[2][1] = m[2][1];
-                result[2][2] = m[2][2];
-
-                return result;
-            }
-
-            // Scene parameters
             uniform vec3 camera;
             uniform mat4 modelMatrix;
 
             varying vec3 normal;
             varying vec3 viewDir;
-
             void main()
             {
+               mat3 normalMatrix;
+
+               // First column
+               normalMatrix[0][0] = modelMatrix[0][0];
+               normalMatrix[0][1] = modelMatrix[0][1];
+               normalMatrix[0][2] = modelMatrix[0][2];
+
+               // Second column
+               normalMatrix[1][0] = modelMatrix[1][0];
+               normalMatrix[1][1] = modelMatrix[1][1];
+               normalMatrix[1][2] = modelMatrix[1][2];
+
+               // Third column
+               normalMatrix[2][0] = modelMatrix[2][0];
+               normalMatrix[2][1] = modelMatrix[2][1];
+               normalMatrix[2][2] = modelMatrix[2][2];
+
                gl_Position = ftransform();
 
                // World-space lighting
                vec3 eyePos   = vec3(gl_TextureMatrix[0] * modelMatrix * gl_Vertex);
-               normal        = normalize(linearPart(modelMatrix) * gl_Normal);
+               normal        = normalize(normalMatrix * gl_Normal);
                viewDir       = normalize(eyePos - camera);
             }
         >>
