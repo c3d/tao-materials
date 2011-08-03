@@ -44,28 +44,111 @@ plastic_shader ->
     **/
     shader_program
         vertex_shader <<
+            #extension GL_EXT_gpu_shader4 : require
+            #extension GL_EXT_gpu_shader4 : enable
+
             varying float ratio;
             uniform vec3 camera;
+
+            uniform int lights;
+
+            varying vec3 lightDir[8];
+            varying vec3 viewDir;
+            varying vec3 normal;
             void main()
             {
                gl_Position = ftransform();
 
                // World-space lighting
-               vec3 worldPos = vec3(gl_ModelViewMatrix * gl_Vertex);
-               vec3 normal   = normalize (gl_NormalMatrix * gl_Normal);
-               vec3 eyePos   = normalize(camera - worldPos);
+               normal   =  normalize(gl_NormalMatrix * gl_Normal);
+               viewDir  = -normalize((gl_ModelViewMatrix * gl_Vertex).xyz);
 
+               vec3 eyePos   = normalize(camera + viewDir);
                ratio = 0.5 * (1.0 + dot(eyePos, normal));
+
+               // Compute light direction
+               if(lights > 0)
+                   for(int i = 0; i < lights; i++)
+                       if(bool(lights & (1 << i)))
+                           lightDir[i] = gl_LightSource[i].position.xyz;
             }
         >>
         fragment_shader <<
+            #extension GL_EXT_gpu_shader4 : require
+            #extension GL_EXT_gpu_shader4 : enable
+
             varying float ratio;
             uniform vec3 color;
+
+            uniform int lights;
+
+            varying vec3 lightDir[8];
+            varying vec3 viewDir;
+            varying vec3 normal;
+            /**
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene.
+            **/
+
+            vec4 computeRenderColor(vec4 renderColor)
+            {
+                vec4 lighting_color;
+                if(lights > 0)
+                {
+                    vec3 N = normalize(normal);
+                    vec3 V = normalize(viewDir);
+
+                    vec4 ambient  = vec4(0.0);
+                    vec4 diffuse  = vec4(0.0);
+                    vec4 specular = vec4(0.0);
+                    ambient  = gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient;
+
+                    for(int i = 0; i < lights; i++)
+                    {
+                        if(bool(lights & (1 << i)))
+                        {
+                            vec3 L = normalize(lightDir[i]);
+
+                            // Compute ambient part
+                            ambient += gl_LightSource[i].ambient * gl_FrontMaterial.ambient;
+
+                            // Diffuse coefficient
+                            float nDotL = max(clamp(dot(L, N), 0.0, 1.0), 0.0);
+                            if (nDotL > 0.0)
+                            {
+                                // Compute diffuse part
+                                diffuse += gl_LightSource[i].diffuse * gl_FrontMaterial.diffuse * nDotL;
+
+                                // Compute specular coefficient
+                                float nDotV = clamp(dot(reflect(-L, N), V), 0.0, 1.0);
+                                if (nDotV > 0.0)
+                                {
+                                    // Compute specular part
+                                    specular += gl_LightSource[i].specular * gl_FrontMaterial.specular * pow(nDotV, gl_FrontMaterial.shininess);
+                                }
+                            }
+                        }
+                    }
+
+                     // Define new render color
+                    lighting_color  = (ambient + diffuse) * vec4(color, 1.0) * renderColor + specular;
+                }
+                else
+                {
+                    // Define new render color
+                    lighting_color = renderColor * vec4(color, 1.0);
+                }
+
+                return lighting_color;
+            }
+
             void main()
             {
-                gl_FragColor = vec4(ratio * color, 1.0);
+                vec4 renderColor = vec4(ratio, ratio, ratio, 1.0);
+                gl_FragColor = computeRenderColor(renderColor);
             }
         >>
+    shader_set lights := light_id
     shader_set color  := (PLASTIC_R; PLASTIC_G; PLASTIC_B)
 
     //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
@@ -229,7 +312,7 @@ gold ->
     /**
     * Define a sort of gold material.
     **/
-    fresnel_material 0.65, 0.607, 0.031, 0.7, 0.47, 1.0
+    fresnel_material 0.65, 0.607, 0.031, 0.7, 0.47, 100.0
 
 // -------------------------------------------------------------------------------------------------------------------
 //   IRON MATERIAL
