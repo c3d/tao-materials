@@ -14,77 +14,182 @@ module_description
     version "1.0"
 
 module_description "fr",
-    name "Matériaux"
+    name "Filtrage"
     description "Permet d'appliquer différents matériaux sur des objets présent dans une scène."
 
-import Mapping 1.0
-
 // -------------------------------------------------------------------------------------------------------------------
-//   MARBLE MATERIAL
+//   PLASTIC MATERIAL
 // -------------------------------------------------------------------------------------------------------------------
 
-marble scale:real ->
+// Plastic color
+PLASTIC_R -> 1.0
+PLASTIC_R := 1.0
+PLASTIC_G -> 1.0
+PLASTIC_G := 1.0
+PLASTIC_B -> 1.0
+PLASTIC_B := 1.0
+
+plastic r:real, g:real, b:real ->
     /**
-    * Apply marble material.
+    * Apply plastic material.
     **/
-    marble scale, 128
+    PLASTIC_R := r
+    PLASTIC_G := g
+    PLASTIC_B := b
+    plastic_shader
 
-marble scale:real, seed:integer ->
+plastic_shader ->
     /**
-    * Apply marble material.
+    * Define plastic shader.
     **/
-    // Default noise map 3D
-    noise_map_3D 128, 128, seed
+    shader_program
+        vertex_shader <<
+            varying float ratio;
+            uniform vec3 camera;
+            void main()
+            {
+               gl_Position = ftransform();
 
-    marble_material texture_unit, scale
+               // World-space lighting
+               vec3 worldPos = vec3(gl_ModelViewMatrix * gl_Vertex);
+               vec3 normal   = normalize (gl_NormalMatrix * gl_Normal);
+               vec3 eyePos   = normalize(camera - worldPos);
 
-// -------------------------------------------------------------------------------------------------------------------
-//   GRANITE MATERIAL
-// -------------------------------------------------------------------------------------------------------------------
+               ratio = 0.5 * (1.0 + dot(eyePos, normal));
+            }
+        >>
+        fragment_shader <<
+            varying float ratio;
+            uniform vec3 color;
+            void main()
+            {
+                gl_FragColor = vec4(ratio * color, 1.0);
+            }
+        >>
+    shader_set color  := (PLASTIC_R; PLASTIC_G; PLASTIC_B)
 
-granite scale:real ->
-    /**
-    * Apply default granite material.
-    **/
-    granite scale, 128
-
-granite scale:real, seed:integer ->
-    /**
-    * Apply granite material.
-    **/
-    // Default noise map 3D
-    noise_map_3D 128, 128, seed
-
-    granite_material texture_unit, scale
-
-// -------------------------------------------------------------------------------------------------------------------
-//   WOOD MATERIAL
-// -------------------------------------------------------------------------------------------------------------------
-
-wood scale:real ->
-    /**
-    * Apply wood material.
-    **/
-    wood scale, 20.0, 0.87, 128
-
-wood scale:real, ring:real, noise:real, seed:integer ->
-    /**
-    * Apply wood material.
-    **/
-    // Default noise map 3D
-    noise_map_3D 128, 128, seed
-
-    wood_material texture_unit, scale, ring, noise
+    //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
+    shader_set camera := (camera_position at 1; camera_position at 2; camera_position at 3)
 
 // -------------------------------------------------------------------------------------------------------------------
 //   FRESNEL MATERIAL
 // -------------------------------------------------------------------------------------------------------------------
 
-fresnel_material r:real, n:real, roughness:real ->
+// Material roughness
+FRESNEL_ROUGHNESS -> 1.0
+FRESNEL_ROUGHNESS := 1.0
+
+// Indice of refraction
+FRESNEL_REFRACTION -> 1.0
+FRESNEL_REFRACTION := 1.0
+
+// Material color
+FRESNEL_R -> 1.0
+FRESNEL_R := 1.0
+FRESNEL_G -> 1.0
+FRESNEL_G := 1.0
+FRESNEL_B -> 1.0
+FRESNEL_B := 1.0
+FRESNEL_A -> 0.5
+FRESNEL_A := 0.5
+
+fresnel_material r:real, g:real, b:real, a:real, n:real, roughness:real ->
     /**
-    * Apply a fresnel material with the current cube map.
+    * Apply a fresnel material.
     **/
-    fresnel_material texture_unit, r, n, roughness
+    FRESNEL_R := r
+    FRESNEL_G := g
+    FRESNEL_B := b
+    FRESNEL_A := a
+    FRESNEL_REFRACTION := n
+    FRESNEL_ROUGHNESS  := roughness
+    fresnel_shader
+
+fresnel_shader ->
+    /**
+    * Define shader for fresnel material.
+    **/
+    shader_program
+        shader_log
+        vertex_shader <<
+            uniform vec3 camera;
+            uniform mat4 modelMatrix;
+
+            varying vec3 normal;
+            varying vec3 viewDir;
+            void main()
+            {
+               mat3 normalMatrix;
+
+               // First column
+               normalMatrix[0][0] = modelMatrix[0][0];
+               normalMatrix[0][1] = modelMatrix[0][1];
+               normalMatrix[0][2] = modelMatrix[0][2];
+
+               // Second column
+               normalMatrix[1][0] = modelMatrix[1][0];
+               normalMatrix[1][1] = modelMatrix[1][1];
+               normalMatrix[1][2] = modelMatrix[1][2];
+
+               // Third column
+               normalMatrix[2][0] = modelMatrix[2][0];
+               normalMatrix[2][1] = modelMatrix[2][1];
+               normalMatrix[2][2] = modelMatrix[2][2];
+
+               gl_Position = ftransform();
+
+               // World-space lighting
+               vec3 eyePos   = vec3(gl_TextureMatrix[0] * modelMatrix * gl_Vertex);
+               normal        = normalize(normalMatrix * gl_Normal);
+               viewDir       = normalize(eyePos - camera);
+            }
+        >>
+        fragment_shader <<
+
+            // Material parameters
+            uniform float Eta; // Ratio of indices of refraction
+            uniform float ratio;
+            uniform float roughness;
+            uniform vec4 baseColor;
+            uniform samplerCube environmentMap;
+
+            varying vec3 normal;
+            varying vec3 viewDir;
+
+            const float roughness_ratio = 50.0;
+
+            void main()
+            {
+                vec3 reflectDir, refractDir;
+                reflectDir = normalize(reflect(viewDir, normal));
+                refractDir = normalize(refract(viewDir, normal, Eta));
+
+                vec3 reflectColor, refractColor;
+                reflectColor = textureCube(environmentMap, reflectDir).xyz;
+                refractColor = textureCube(environmentMap, refractDir).xyz;
+
+                // Compute fresnel ratio
+                float fresnel = pow(1.0 - (dot(-viewDir, normal)), 1.0 / (roughness * roughness_ratio));
+
+                // Compute final color
+                vec3 color      = mix(refractColor, reflectColor, fresnel);
+                vec3 finalColor = mix(color, baseColor.rgb, baseColor.a);
+
+                gl_FragColor  = vec4( finalColor, 1.0);
+            }
+        >>
+
+    shader_set Eta            := FRESNEL_REFRACTION
+    shader_set baseColor      := (FRESNEL_R; FRESNEL_G; FRESNEL_B; FRESNEL_A)
+    shader_set roughness      := FRESNEL_ROUGHNESS
+    shader_set environmentMap := texture_unit
+
+    //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
+    shader_set camera         := (camera_position at 1; camera_position at 2; camera_position at 3)
+    shader_set modelMatrix    := (model_matrix at 1;  model_matrix at 2;  model_matrix at 3;  model_matrix at 4;
+                                  model_matrix at 5;  model_matrix at 6;  model_matrix at 7;  model_matrix at 8;
+                                  model_matrix at 9;  model_matrix at 10; model_matrix at 11; model_matrix at 12;
+                                  model_matrix at 13; model_matrix at 14; model_matrix at 15; model_matrix at 16)
 
 // -------------------------------------------------------------------------------------------------------------------
 //   GLASS MATERIAL
@@ -94,11 +199,7 @@ glass ->
     /**
     * Define a sort of glass material.
     **/
-    material_ambient 0.0, 0.0, 0.0, 0.0
-    material_diffuse 0.588235, 0.670588, 0.729412, 1.0
-    material_specular 0.9, 0.9, 0.9, 1.0
-    material_shininess 96.0
-    fresnel_material 0.2, 1.12, 0.01
+    fresnel_material 1.0, 1.0, 1.0, 0.1, 1.12, 0.01
 
 // -------------------------------------------------------------------------------------------------------------------
 //   BRONZE MATERIAL
@@ -108,11 +209,7 @@ bronze ->
     /**
     * Define a sort of bronze material.
     **/
-    material_ambient 0.2125, 0.1275, 0.054, 1.0
-    material_diffuse 0.714, 0.4284, 0.18144, 1.0
-    material_specular 0.3935, 0.2719, 0.1667, 1.0
-    material_shininess 25.6
-    fresnel_material 0.93, 1.18, 10.0
+    fresnel_material 0.34, 0.24, 0.1, 0.93, 1.18, 1.0
 
 // -------------------------------------------------------------------------------------------------------------------
 //   SILVER MATERIAL
@@ -122,11 +219,7 @@ silver ->
     /**
     * Define a sort of silver material.
     **/
-    material_ambient 0.19225, 0.19225, 0.19225, 1.0
-    material_diffuse 0.50754, 0.50754, 0.50754, 1.0
-    material_specular 0.508273, 0.508273, 0.508273, 1.0
-    material_shininess 51.2
-    fresnel_material 0.7, 0.8, 10.0
+    fresnel_material 0.807, 0.807, 0.807, 0.4, 0.8, 1.0
 
 // -------------------------------------------------------------------------------------------------------------------
 //   GOLD MATERIAL
@@ -136,11 +229,7 @@ gold ->
     /**
     * Define a sort of gold material.
     **/
-    material_ambient 0.24725, 0.1995, 0.0745, 1.0
-    material_diffuse 0.75164, 0.60648, 0.22648, 1.0
-    material_specular 0.628281, 0.555802, 0.366065, 1.0
-    material_shininess 51.2
-    fresnel_material 0.7, 0.47, 10.0
+    fresnel_material 0.65, 0.607, 0.031, 0.7, 0.47, 1.0
 
 // -------------------------------------------------------------------------------------------------------------------
 //   IRON MATERIAL
@@ -150,25 +239,17 @@ iron ->
     /**
     * Define a sort of iron material.
     **/
-    material_ambient 0.19225, 0.19225, 0.19225, 1.0
-    material_diffuse 0.43, 0.376, 0.364, 1.0
-    material_specular 0.508273, 0.508273, 0.508273, 1.0
-    material_shininess 51.2
-    fresnel_material 0.6, 2.95, 1.0
+    fresnel_material 0.43, 0.376, 0.364, 0.6, 2.95, 1.0
 
 // -------------------------------------------------------------------------------------------------------------------
 //   CHROMIUM MATERIAL
 // -------------------------------------------------------------------------------------------------------------------
 
-chrome  ->
+chromium  ->
     /**
     * Define a sort of chrome material.
     **/
-    material_ambient 0.25, 0.25, 0.25, 1.0
-    material_diffuse 0.4, 0.4, 0.4, 1.0
-    material_specular 0.774597, 0.774597, 0.774597, 1.0
-    material_shininess 76.8
-    fresnel_material 0.35, 2.705, 10.0
+    fresnel_material 0.8, 0.8, 0.8, 0.1, 2.97, 1.0
 
 // -------------------------------------------------------------------------------------------------------------------
 //   WATER MATERIAL
@@ -178,11 +259,7 @@ water ->
     /**
     * Define a sort of water material.
     **/
-    material_ambient 0.0, 0.0, 0.0, 0.0
-    material_diffuse  0.35, 0.5, 0.5, 1.0
-    material_specular 0.9, 0.9, 0.9, 1.0
-    material_shininess 76.8
-    fresnel_material 0.5, 1.325, 0.01
+    fresnel_material 0.35, 0.5, 0.5, 0.5, 1.325, 0.01
 
 // -------------------------------------------------------------------------------------------------------------------
 //   EMERALD MATERIAL
@@ -192,11 +269,7 @@ emerald ->
     /**
     * Define a sort of emerald material.
     **/
-    material_ambient 0.0215, 0.1745, 0.0215, 0.55
-    material_diffuse 0.07568, 0.61424, 0.07568, 0.55
-    material_specular 0.633, 0.727811, 0.633, 0.55
-    material_shininess 76.8
-    fresnel_material 0.65, 1.56, 0.01
+    fresnel_material 0.0, 0.6, 0.1, 0.65, 1.56, 0.03
 
 // -------------------------------------------------------------------------------------------------------------------
 //   RUBY MATERIAL
@@ -206,23 +279,6 @@ ruby ->
     /**
     * Define a sort of ruby material.
     **/
-    material_ambient 0.1745, 0.01175, 0.01175, 0.55
-    material_diffuse 0.61424, 0.04136, 0.04136, 0.55
-    material_specular 0.727811, 0.626959, 0.626959, 0.55
-    material_shininess 76.8
-    fresnel_material 0.65, 1.757, 0.01
+    fresnel_material 0.6, 0.1, 0.1, 0.7, 1.757, 0.03
 
-// -------------------------------------------------------------------------------------------------------------------
-//   JADE MATERIAL
-// -------------------------------------------------------------------------------------------------------------------
-
-jade ->
-    /**
-    * Define a sort of jade material.
-    **/
-    material_ambient 0.135, 0.2225, 0.1575, 0.95
-    material_diffuse 0.54, 0.89, 0.63, 0.95
-    material_specular 0.316228, 0.316228, 0.316228, 0.95
-    material_shininess 12.8
-    fresnel_material 0.7, 1.64, 10.0
 
