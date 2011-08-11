@@ -17,6 +17,9 @@ module_description "fr",
     name "Filtrage"
     description "Permet d'appliquer différents matériaux sur des objets présent dans une scène."
 
+SHADER4_AVAILABLE_MATERIALS -> true
+SHADER4_AVAILABLE_MATERIALS := is_ext_available "GL_EXT_gpu_shader4"
+
 // -------------------------------------------------------------------------------------------------------------------
 //   PLASTIC MATERIAL
 // -------------------------------------------------------------------------------------------------------------------
@@ -36,11 +39,14 @@ plastic r:real, g:real, b:real ->
     PLASTIC_R := r
     PLASTIC_G := g
     PLASTIC_B := b
-    plastic_shader
+    if SHADER4_AVAILABLE_MATERIALS = true then
+        plastic_shader_lights
+    else
+        plastic_shader_no_lights
 
-plastic_shader ->
+plastic_shader_lights ->
     /**
-    * Define plastic shader.
+    * Define plastic shader with a full support of lights.
     **/
     shader_program
         vertex_shader <<
@@ -150,7 +156,38 @@ plastic_shader ->
         >>
     shader_set lights := light_id
     shader_set color  := (PLASTIC_R; PLASTIC_G; PLASTIC_B)
+    //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
+    shader_set camera := (camera_position at 1; camera_position at 2; camera_position at 3)
 
+plastic_shader_no_lights ->
+    /**
+    * Define plastic shader with no lights supported.
+    **/
+    shader_program
+        vertex_shader <<
+            varying float ratio;
+            uniform vec3 camera;
+            void main()
+            {
+               gl_Position = ftransform();
+
+               // World-space lighting
+               vec3 worldPos = vec3(gl_ModelViewMatrix * gl_Vertex);
+               vec3 normal   = normalize (gl_NormalMatrix * gl_Normal);
+               vec3 eyePos   = normalize(camera - worldPos);
+
+               ratio = 0.5 * (1.0 + dot(eyePos, normal));
+            }
+        >>
+        fragment_shader <<
+            varying float ratio;
+            uniform vec3 color;
+            void main()
+            {
+                gl_FragColor = vec4(ratio * color, 1.0);
+            }
+        >>
+    shader_set color  := (PLASTIC_R; PLASTIC_G; PLASTIC_B)
     //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
     shader_set camera := (camera_position at 1; camera_position at 2; camera_position at 3)
 
