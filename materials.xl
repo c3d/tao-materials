@@ -139,7 +139,7 @@ plastic_shader_lights ->
                 gl_FragColor = computeRenderColor(renderColor);
             }
         >>
-    shader_set lights := light_id
+    shader_set lights := lights_mask
     shader_set color  := (PLASTIC_R; PLASTIC_G; PLASTIC_B)
     //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
     shader_set camera := (camera_position at 1; camera_position at 2; camera_position at 3)
@@ -381,7 +381,7 @@ fresnel_shader_lights ->
     shader_set ratio          := FRESNEL_RATIO
     shader_set roughness      := FRESNEL_ROUGHNESS
     shader_set environmentMap := texture_unit
-    shader_set lights         := light_id
+    shader_set lights         := lights_mask
 
     //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
     shader_set camera         := (camera_position at 1; camera_position at 2; camera_position at 3)
