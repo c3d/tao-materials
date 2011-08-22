@@ -50,15 +50,9 @@ plastic_shader_lights ->
     **/
     shader_program
         vertex_shader <<
-            #extension GL_EXT_gpu_shader4 : require
-            #extension GL_EXT_gpu_shader4 : enable
-
             varying float ratio;
             uniform vec3 camera;
 
-            uniform int lights;
-
-            varying vec3 lightDir[8];
             varying vec3 viewDir;
             varying vec3 normal;
             void main()
@@ -71,24 +65,16 @@ plastic_shader_lights ->
 
                vec3 eyePos   = normalize(camera + viewDir);
                ratio = 0.5 * (1.0 + dot(eyePos, normal));
-
-               // Compute light direction
-               if(lights > 0)
-                   for(int i = 0; i < lights; i++)
-                       if(bool(lights & (1 << i)))
-                           lightDir[i] = gl_LightSource[i].position.xyz;
             }
         >>
         fragment_shader <<
             #extension GL_EXT_gpu_shader4 : require
             #extension GL_EXT_gpu_shader4 : enable
 
-            varying float ratio;
             uniform vec3 color;
-
             uniform int lights;
 
-            varying vec3 lightDir[8];
+            varying float ratio;
             varying vec3 viewDir;
             varying vec3 normal;
             /**
@@ -112,7 +98,7 @@ plastic_shader_lights ->
                     {
                         if(bool(lights & (1 << i)))
                         {
-                            vec3 L = normalize(lightDir[i]);
+                            vec3 L = normalize(gl_LightSource[i].position.xyz);
 
                             // Compute ambient part
                             ambient += gl_LightSource[i].ambient * gl_FrontMaterial.ambient;
@@ -153,7 +139,7 @@ plastic_shader_lights ->
                 gl_FragColor = computeRenderColor(renderColor);
             }
         >>
-    shader_set lights := light_id
+    shader_set lights := lights_mask
     shader_set color  := (PLASTIC_R; PLASTIC_G; PLASTIC_B)
     //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
     shader_set camera := (camera_position at 1; camera_position at 2; camera_position at 3)
@@ -227,19 +213,16 @@ fresnel_shader_lights ->
         shader_log
         vertex_shader <<
             #extension GL_EXT_gpu_shader4 : require
-            #extension GL_EXT_gpu_shader4 : enable
 
             uniform vec3 camera;
             uniform mat4 modelMatrix;
 
-            uniform int lights;
-
             varying vec3 normalWorld;
             varying vec3 viewWorld;
 
-            varying vec3 lightDir[8];
             varying vec3 normal;
             varying vec3 viewDir;
+
             void main()
             {
                mat3 normalMatrix;
@@ -270,17 +253,10 @@ fresnel_shader_lights ->
                eyePos  = (gl_ModelViewMatrix * gl_Vertex).xyz;
                normal  = normalize(gl_NormalMatrix * gl_Normal);
                viewDir = normalize(-eyePos);
-
-               // Compute light direction
-               if(lights > 0)
-                   for(int i = 0; i < lights; i++)
-                       if(bool(lights & (1 << i)))
-                           lightDir[i] = gl_LightSource[i].position.xyz;
             }
         >>
         fragment_shader <<
             #extension GL_EXT_gpu_shader4 : require
-            #extension GL_EXT_gpu_shader4 : enable
 
             // Material parameters
             uniform float Eta; // Ratio of indices of refraction
@@ -293,7 +269,6 @@ fresnel_shader_lights ->
             varying vec3 normalWorld;
             varying vec3 viewWorld;
 
-            varying vec3 lightDir[8];
             varying vec3 normal;
             varying vec3 viewDir;
 
@@ -321,7 +296,7 @@ fresnel_shader_lights ->
                     {
                         if(bool(lights & (1 << i)))
                         {
-                            vec3 L = normalize(lightDir[i]);
+                            vec3 L = normalize(gl_LightSource[i].position.xyz);
 
                             // Compute ambient part
                             ambient += gl_LightSource[i].ambient * gl_FrontMaterial.ambient;
@@ -406,7 +381,7 @@ fresnel_shader_lights ->
     shader_set ratio          := FRESNEL_RATIO
     shader_set roughness      := FRESNEL_ROUGHNESS
     shader_set environmentMap := texture_unit
-    shader_set lights         := light_id
+    shader_set lights         := lights_mask
 
     //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
     shader_set camera         := (camera_position at 1; camera_position at 2; camera_position at 3)
@@ -492,7 +467,7 @@ fresnel_shader_no_lights ->
                 vec4 diffuse  = vec4(0.0);
                 vec4 specular = vec4(0.0);
 
-                // We define a default light position in case there are no one defined.
+                // We define a default light in case there are no one defined.
                 vec3 L = normalize(vec3(0, 0, 50));
 
                 // Compute ambient part
