@@ -5,9 +5,7 @@
  * Define some useful materials.
  *
  * This module allows you to define and apply some useful materials on your different objects.
- * The following image shows a set of some defined materials.
  *
- * @image html materials.png "Example of materials"
  *
  * @note Materials defined in this module are adapted for a basic usage.
  * @note For more complex scene, it is recommended to define directly your own materials
@@ -19,161 +17,13 @@
 /**
  * Defines a sort of plastic material.
  *
- * Set a sort of plastic material, whose color is defined by (@p r, @p g, @p b).
+ * Set a sort of plastic material, whose color is define by(@p r, @p g, @p b).
  *
  * @note This material act as a simple texture.
  * @note There is no one reflection on this material.
  *
  */
 plastic(r:real, g:real, b:real);
-
-/**
- * Defines the first color of the marble material.
- *
- * Set color define by (@p r, @p g, @p b) as first color of the marble material.
- * It corresponds to the color of the regions with no veining.
- * The default value is (1.0, 1.0, 1.0).
- */
-marble_first_color(r:real, g:real, b:real);
-
-/**
- * Defines the first color of the marble material.
- *
- * Set color define by (@p r, @p g, @p b) as first color of the marble material.
- * It corresponds to the color of the veining.
- * The default value is (0.60, 0.50, 0.50).
- */
-marble_second_color(r:real, g:real, b:real);
-
-/**
- * Defines a sort of marble material.
- *
- * Set a sort of marble material, whose colors are defined by @ref marble_first_color and @ref marble_second_color.
- *
- * @param scale scaling parameter of the material.
- * @param seed distribution of the veining. In this case, there is limit of 200 seeds.
- *
- * @note This material is a procedural texture.
- */
-marble(scale:real, seed:integer);
-
-/**
- * Defines a default sort of marble material.
- *
- * Set a sort of marble material, whose colors are defined by @ref marble_first_color and @ref marble_second_color.
- *
- * @param scale scaling parameter of the material.
- *
- * @note This material is a procedural texture.
- * @note This function is a shortcut to the following code.
-@code
-marble scale, 128
-@endcode
- */
-marble(scale:real);
-
-/**
- * Defines the first color of the granite material.
- *
- * Set color define by(@p r, @p g, @p b) as first color of the granite material.
- * It corresponds to the color of the regions with no veining.
- * The default value is (0.30, 0.15, 0.10).
- */
-granite_first_color(r:real, g:real, b:real);
-
-/**
- * Defines the first color of the granite material.
- *
- * Set color define by (@p r, @p g, @p b) as first color of the granite material.
- * It corresponds to the color of the veining.
- * The default value is (0.80, 0.73, 0.71).
- */
-granite_second_color(r:real, g:real, b:real);
-
-/**
- * Defines the first color of the marble material.
- *
- * Set color define by (@p r, @p g, @p b) as first color of the marble material.
- * It corresponds to the color of the marks.
- * The default value is (0.20, 0.20, 0.20).
- */
-granite_third_color(r:real, g:real, b:real);
-
-/**
- * Defines a sort of granite material.
- *
- * Set a sort of granite material, whose colors are defined by @ref granite_first_color, @ref granite_second_color
- * and @ref granite_third_color.
- *
- * @param scale scaling parameter of the material.
- * @param seed distribution of the veining. In this case, there is limit of 200 seeds.
- *
- * @note This material is a procedural texture.
- */
-granite(scale:real, seed:integer);
-
-/**
- * Defines a default sort of granite material.
- *
- * Set a sort of granite material, whose colors are defined by @ref granite_first_color, @ref granite_second_color
- * and @ref granite_third_color.
- *
- * @param scale Scaling parameter of the material.
- *
- * @note This material is a procedural texture.
- * @note This function is a shortcut to the following code.
-@code
-granite scale, 128
-@endcode
- */
-granite(scale:real);
-
-/**
- * Defines the first color of the wood material.
- *
- * Set color define by (@p r, @p g, @p b) as first color of the wood material.
- * It corresponds to the color of the regions with no grain.
- * The default value is (0.92, 0.51, 0.13).
- */
-wood_first_color(r:real, g:real, b:real);
-
-/**
- * Defines the second color of the wood material.
- *
- * Set color define by (@p r, @p g, @p b) as first color of the wood material.
- * It corresponds to the color of the grain.
- * The default value is (0.44, 0.21, 0.0).
- */
-wood_second_color(r:real, g:real, b:real);
-
-/**
- * Defines a sort of wood material.
- *
- * Set a sort of wood material, whose colors are defined by @ref wood_first_color and @ref wood_second_color.
- *
- * @param scale Scaling parameter of the material.
- * @param ring Size of the rings
- * @param noise Influence of the noise on the material.
- * @param seed distribution of the grain. In this case, there is limit of 200 seeds.
- *
- * @note This material is a procedural texture.
- */
-wood(scale:real, ring:real, noise:real, seed:integer);
-
-/**
- * Defines a default sort of wood material.
- *
- * Set a sort of wood material, whose colors are defined by @ref wood_first_color and @ref wood_second_color.
- *
- * @param scale Scaling parameter of the material.
- *
- * @note This material is a procedural texture.
- * @note This function is a shortcut to the following code.
-@code
-wood scale, 20.0, 0.87, 128
-@endcode
- */
-wood(scale:real);
 
 /**
  * Defines a fresnel material.
@@ -247,7 +97,7 @@ material_ambient 0.19225, 0.19225, 0.19225, 1.0
 material_diffuse 0.50754, 0.50754, 0.50754, 1.0
 material_specular 0.508273, 0.508273, 0.508273, 1.0
 material_shininess 51.2
-fresnel_material 0.7, 0.8, 10.0
+fresnel_material 0.4, 0.8, 10.0
 @endcode
  *
  */
@@ -304,7 +154,7 @@ material_ambient 0.25, 0.25, 0.25, 1.0
 material_diffuse 0.4, 0.4, 0.4, 1.0
 material_specular 0.774597, 0.774597, 0.774597, 1.0
 material_shininess 76.8
-fresnel_material 0.35, 2.705, 10.0
+fresnel_material 0.25, 2.97, 10.0
 @endcode
  *
  */
@@ -361,7 +211,7 @@ material_ambient 0.135, 0.2225, 0.1575, 0.95
 material_diffuse 0.54, 0.89, 0.63, 0.95
 material_specular 0.316228, 0.316228, 0.316228, 0.95
 material_shininess 12.8
-fresnel_material 0.7, 1.64, 10.0
+fresnel_material 0.7, 1.640, 0.01
 @endcode
  *
  */
