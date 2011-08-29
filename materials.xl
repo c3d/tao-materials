@@ -293,9 +293,6 @@ marble scale:real, seed:integer ->
     **/
     MARBLE_SIZE := scale
 
-    // Rotation in order to enable pixel blur
-    rotatex 0.02
-
     // Default noise map 3D
     noise_map_3D 128, 128, seed
 
@@ -617,9 +614,6 @@ granite scale:real ->
     * Apply granite material.
     **/
     GRANITE_SIZE := scale
-
-    // Rotation in order to enable pixel blur
-    rotatex 0.02
 
     // Default noise map 3D
     noise_map_3D 128, 128, 128
@@ -980,9 +974,6 @@ wood scale:real, ring:real, noise:real, seed:integer ->
     RING_SIZE   := ring
     NOISE_RATIO := noise
 
-    // Rotation in order to enable pixel blur
-    rotatex 0.02
-
     // Default noise map 3D
     noise_map_3D 128, 128, seed
 
@@ -1118,19 +1109,20 @@ wood_shader_lights ->
 
             void main()
             {
-               float noise = texture3D(noiseMap, 0.5 * gl_TexCoord[0]).x - 1.0;
+               vec3 texCoord = 0.5 * gl_TexCoord[0].xyz;
+               float noise   = texture3D(noiseMap, texCoord).x - 1.0;
 
-               // Rings will go along z axis, perturbed with some noise
+               // Define some rings of the wood
                float r = fract(ringSize * gl_TexCoord[0].z + noiseRatio * noise);
 
-               float sharpness = 20.0;
-               float ring = (r - pow(r, sharpness));
+               float sharp = 20.0;
+               float ring  = (r - pow(r, sharp));
 
                // Add noise
                float ratio = ring + noise;
 
                vec3 mainColor = mix(first_color, second_color, ratio);
-               gl_FragColor = computeRenderColor(vec4(mainColor, 1.0));
+               gl_FragColor   = computeRenderColor(vec4(mainColor, 1.0));
             }
         >>
     shader_set noiseMap     := texture_unit                                  // Unit of the noise map
@@ -1220,19 +1212,20 @@ wood_shader_no_lights ->
 
             void main()
             {
-               float noise = texture3D(noiseMap, 0.5 * gl_TexCoord[0]).x - 1.0;
+               vec3 texCoord = 0.5 * gl_TexCoord[0].xyz;
+               float noise   = texture3D(noiseMap, texCoord).x - 1.0;
 
-               // Rings will go along z axis, perturbed with some noise
+               // Define some rings of the wood
                float r = fract(ringSize * gl_TexCoord[0].z + noiseRatio * noise);
 
-               float sharpness = 20.0;
-               float ring = (r - pow(r, sharpness));
+               float sharp = 20.0;
+               float ring  = (r - pow(r, sharp));
 
                // Add noise
                float ratio = ring + noise;
 
                vec3 mainColor = mix(first_color, second_color, ratio);
-               gl_FragColor = computeRenderColor(vec4(mainColor, 1.0));
+               gl_FragColor   = computeRenderColor(vec4(mainColor, 1.0));
             }
         >>
     shader_set noiseMap     := texture_unit                                  // Unit of the noise map
