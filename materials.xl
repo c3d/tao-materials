@@ -101,15 +101,11 @@ plastic_shader_lights ->
             varying vec3  viewDir;
             varying vec3  normal;
             /**
-            * Compute render color according to materials,
-            * lights and colors parameters which are
-            * set in the current scene.
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene.
             **/
             vec4 computeRenderColor(vec4 renderColor)
             {
-                // Define a maximum of lights supported
-                int MAX_LIGHTS = 8;
-
                 vec4 lighting_color;
                 if(lights > 0)
                 {
@@ -121,7 +117,7 @@ plastic_shader_lights ->
                     vec4 specular = vec4(0.0);
                     ambient  = gl_FrontLightModelProduct.sceneColor;
 
-                    for(int i = 0; i < MAX_LIGHTS; i++)
+                    for(int i = 0; i < lights; i++)
                     {
                         if(bool(lights & (1 << i)))
                         {
@@ -278,7 +274,18 @@ marble scale:real ->
     /**
     * Apply marble material.
     **/
-    marble scale, 128
+    MARBLE_SIZE := scale
+
+    // Rotation in order to enable pixel blur
+    rotatex 0.02
+
+    // Default noise map 3D
+    noise_map_3D 128, 128, 128
+
+    if SHADER4_AVAILABLE_MATERIALS = false then
+        marble_shader_no_lights
+    else
+        marble_shader_lights
 
 marble scale:real, seed:integer ->
     /**
@@ -288,9 +295,6 @@ marble scale:real, seed:integer ->
 
     // Default noise map 3D
     noise_map_3D 128, 128, seed
-
-    // Rotation in order to enable pixel blur
-    rotatex 0.05
 
     if SHADER4_AVAILABLE_MATERIALS = false then
         marble_shader_no_lights
@@ -314,7 +318,7 @@ marble_shader_lights ->
                 gl_Position = ftransform();
 
                 // Compute texture coordinates
-                gl_TexCoord[0] = (gl_TextureMatrix[0] * scale * gl_Vertex) / 100.0;
+                gl_TexCoord[0] = scale * gl_Vertex / 100.0;
 
                 // Compute world position and normal
                 normal  = gl_NormalMatrix * gl_Normal;
@@ -332,9 +336,8 @@ marble_shader_lights ->
             varying vec3 viewDir;
             varying vec3 normal;
             /**
-            * Compute render color according to materials,
-            * lights and colors parameters which are
-            * set in the current scene.
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene.
             **/
             vec4 computeRenderColor(vec4 renderColor)
             {
@@ -464,7 +467,7 @@ marble_shader_no_lights ->
                 gl_Position = ftransform();
 
                 // Compute texture coordinates with a scaling factor
-                gl_TexCoord[0] = (gl_TextureMatrix[0] * scale * gl_Vertex) / 100.0;
+                gl_TexCoord[0] = scale * gl_Vertex / 100.0;
 
                 // Compute world position and normal
                 normal  = gl_NormalMatrix * gl_Normal;
@@ -480,9 +483,8 @@ marble_shader_no_lights ->
             varying vec3 normal;
 
             /**
-            * Compute render color according to materials,
-            * lights and colors parameters which are
-            * set in the current scene.
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene.
             **/
             vec4 computeRenderColor(vec4 renderColor)
             {
@@ -609,21 +611,29 @@ granite_third_color r1:real, g1:real, b1:real ->
 
 granite scale:real ->
     /**
-    * Apply default granite material.
-    **/
-    granite scale, 128
-
-granite scale:real, seed:integer ->
-    /**
     * Apply granite material.
     **/
     GRANITE_SIZE := scale
 
     // Default noise map 3D
-    noise_map_3D 128, 128, seed
+    noise_map_3D 128, 128, 128
+
+    if SHADER4_AVAILABLE_MATERIALS = false then
+        granite_shader_no_lights
+    else
+        granite_shader_lights
+
+granite scale:real, seed:integer ->
+    /**
+    * Apply granite material.
+    **/
+    granite_SIZE := scale
 
     // Rotation in order to enable pixel blur
-    rotatex 0.05
+    rotatex 0.02
+
+    // Default noise map 3D
+    noise_map_3D 128, 128, seed
 
     if SHADER4_AVAILABLE_MATERIALS = false then
         granite_shader_no_lights
@@ -647,7 +657,7 @@ granite_shader_lights ->
                 gl_Position = ftransform();
 
                 // Compute texture coordinates
-                gl_TexCoord[0] = (gl_TextureMatrix[0] * scale * gl_Vertex) / 100.0;
+                gl_TexCoord[0] = scale * gl_Vertex / 100.0;
 
                 // Compute world position and normal
                 normal  = gl_NormalMatrix * gl_Normal;
@@ -665,9 +675,8 @@ granite_shader_lights ->
             varying vec3 viewDir;
             varying vec3 normal;
             /**
-            * Compute render color according to materials,
-            * which are lights and colors parameters
-            * set in the current scene.
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene.
             **/
             vec4 computeRenderColor(vec4 renderColor)
             {
@@ -800,7 +809,7 @@ granite_shader_no_lights ->
                 gl_Position = ftransform();
 
                 // Compute texture coordinates
-                gl_TexCoord[0] = (gl_TextureMatrix[0] * scale * gl_Vertex) / 100.0;
+                gl_TexCoord[0] = scale * gl_Vertex / 100.0;
 
                 // Compute world position and normal
                 normal  = gl_NormalMatrix * gl_Normal;
@@ -817,9 +826,8 @@ granite_shader_no_lights ->
             varying vec3 normal;
 
             /**
-            * Compute render color according to materials,
-            * lights and colors parameters which are
-            * set in the current scene.
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene.
             **/
             vec4 computeRenderColor(vec4 renderColor)
             {
@@ -943,7 +951,20 @@ wood scale:real ->
     /**
     * Apply wood material.
     **/
-    wood scale, 20.0, 0.87, 128
+    WOOD_SIZE   := scale
+    RING_SIZE   := 20.0
+    NOISE_RATIO := 0.87
+
+    // Rotation in order to enable pixel blur
+    rotatex 0.02
+
+    // Default noise map 3D
+    noise_map_3D 128, 128, 128
+
+    if SHADER4_AVAILABLE_MATERIALS = false then
+        wood_shader_no_lights
+    else
+        wood_shader_lights
 
 wood scale:real, ring:real, noise:real, seed:integer ->
     /**
@@ -955,9 +976,6 @@ wood scale:real, ring:real, noise:real, seed:integer ->
 
     // Default noise map 3D
     noise_map_3D 128, 128, seed
-
-    // Rotation in order to enable pixel blur
-    rotatex 0.05
 
     if SHADER4_AVAILABLE_MATERIALS = false then
         wood_shader_no_lights
@@ -982,7 +1000,7 @@ wood_shader_lights ->
                 gl_Position = ftransform();
 
                 // Compute texture coordinates
-                gl_TexCoord[0] = (gl_TextureMatrix[0] * scale * gl_Vertex) / 100.0;
+                gl_TexCoord[0] = scale * gl_Vertex / 100.0;
 
                 // Compute world position and normal
                 normal  = gl_NormalMatrix * gl_Normal;
@@ -1003,9 +1021,8 @@ wood_shader_lights ->
             varying vec3 viewDir;
             varying vec3 normal;
             /**
-            * Compute render color according to materials,
-            * lights and colors parameters which are
-            * set in the current scene.
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene.
             **/
             vec4 computeRenderColor(vec4 renderColor)
             {
@@ -1095,10 +1112,14 @@ wood_shader_lights ->
                vec3 texCoord = 0.5 * gl_TexCoord[0].xyz;
                float noise   = texture3D(noiseMap, texCoord).x - 1.0;
 
-               // Define some rings in the wood
-               float f = fract(ringSize * gl_TexCoord[0].x + noiseRatio * noise);
+               // Define some rings of the wood
+               float r = fract(ringSize * gl_TexCoord[0].z + noiseRatio * noise);
 
-               float ratio  = (f - pow(f, 20.0));
+               float sharp = 20.0;
+               float ring  = (r - pow(r, sharp));
+
+               // Add noise
+               float ratio = ring + noise;
 
                vec3 mainColor = mix(first_color, second_color, ratio);
                gl_FragColor   = computeRenderColor(vec4(mainColor, 1.0));
@@ -1129,7 +1150,7 @@ wood_shader_no_lights ->
                 gl_Position = ftransform();
 
                 // Compute texture coordinates
-                gl_TexCoord[0] = (gl_TextureMatrix[0] * scale * gl_Vertex) / 100.0;
+                gl_TexCoord[0] = scale * gl_Vertex / 100.0;
 
                 // Compute world position and normal
                 normal  = gl_NormalMatrix * gl_Normal;
@@ -1146,9 +1167,8 @@ wood_shader_no_lights ->
             varying vec3 viewDir;
             varying vec3 normal;
             /**
-            * Compute render color according to materials,
-            * lights and colors parameters which are
-            * set in the current scene.
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene.
             **/
             vec4 computeRenderColor(vec4 renderColor)
             {
@@ -1195,10 +1215,14 @@ wood_shader_no_lights ->
                vec3 texCoord = 0.5 * gl_TexCoord[0].xyz;
                float noise   = texture3D(noiseMap, texCoord).x - 1.0;
 
-               // Define some rings in the wood
-               float f = fract(ringSize * gl_TexCoord[0].x + noiseRatio * noise);
+               // Define some rings of the wood
+               float r = fract(ringSize * gl_TexCoord[0].z + noiseRatio * noise);
 
-               float ratio  = (f - pow(f, 20.0));
+               float sharp = 20.0;
+               float ring  = (r - pow(r, sharp));
+
+               // Add noise
+               float ratio = ring + noise;
 
                vec3 mainColor = mix(first_color, second_color, ratio);
                gl_FragColor   = computeRenderColor(vec4(mainColor, 1.0));
@@ -1286,9 +1310,9 @@ fresnel_shader_lights ->
                gl_Position = ftransform();
 
                // World-space
-               vec3 eyePos = vec3(gl_TextureMatrix[0] * modelMatrix * gl_Vertex);
-               normalWorld = normalize(normalMatrix * gl_Normal);
-               viewWorld   = normalize(eyePos - camera);
+               vec3 eyePos   = vec3(gl_TextureMatrix[0] * modelMatrix * gl_Vertex);
+               normalWorld   = normalize(normalMatrix * gl_Normal);
+               viewWorld     = normalize(eyePos - camera);
 
                // Eye-space
                eyePos  = (gl_ModelViewMatrix * gl_Vertex).xyz;
@@ -1300,7 +1324,7 @@ fresnel_shader_lights ->
             #extension GL_EXT_gpu_shader4 : require
 
             // Material parameters
-            uniform float IoR; // Index of refraction
+            uniform float Eta; // Ratio of indices of refraction
             uniform float ratio;
             uniform float roughness;
             uniform samplerCube environmentMap;
@@ -1316,15 +1340,11 @@ fresnel_shader_lights ->
             const float roughness_ratio = 50.0;
 
             /**
-            * Compute render color according to materials,
-            * lights and colors parameters which are
-            * set in the current scene (Lambertian model).
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene (Lambertian model).
             **/
             vec4 computeRenderColor()
-            {                           
-                // Define a maximum of lights supported
-                int MAX_LIGHTS = 8;
-
+            {
                 vec4 lighting_color;
                 vec3 N = normalize(normal);
                 vec3 V = normalize(viewDir);
@@ -1335,36 +1355,30 @@ fresnel_shader_lights ->
 
                 if(lights > 0)
                 {
-                    ambient = gl_FrontLightModelProduct.sceneColor
-                            * gl_FrontMaterial.ambient;
+                    ambient  = gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient;
 
-                    for(int i = 0; i < MAX_LIGHTS; i++)
+                    for(int i = 0; i < lights; i++)
                     {
                         if(bool(lights & (1 << i)))
                         {
                             vec3 L = normalize(gl_LightSource[i].position.xyz);
 
                             // Compute ambient part
-                            ambient += gl_LightSource[i].ambient
-                                     * gl_FrontMaterial.ambient;
+                            ambient += gl_LightSource[i].ambient * gl_FrontMaterial.ambient;
 
                             // Diffuse coefficient
                             float nDotL = max(clamp(dot(L, N), 0.0, 1.0), 0.0);
                             if (nDotL > 0.0)
                             {
                                 // Compute diffuse part
-                                diffuse += gl_LightSource[i].diffuse
-                                         * gl_FrontMaterial.diffuse
-                                         * nDotL;
+                                diffuse += gl_LightSource[i].diffuse * gl_FrontMaterial.diffuse * nDotL;
 
                                 // Compute specular coefficient
                                 float nDotV = clamp(dot(reflect(-L, N), V), 0.0, 1.0);
                                 if (nDotV > 0.0)
                                 {
                                     // Compute specular part
-                                    specular += gl_LightSource[i].specular
-                                              * gl_FrontMaterial.specular
-                                              * pow(nDotV, gl_FrontMaterial.shininess);
+                                    specular += gl_LightSource[i].specular * gl_FrontMaterial.specular * pow(nDotV, gl_FrontMaterial.shininess);
                                 }
                             }
                         }
@@ -1393,13 +1407,12 @@ fresnel_shader_lights ->
                         if (nDotV > 0.0)
                         {
                             // Compute specular part
-                            specular = gl_FrontMaterial.specular
-                                     * pow(nDotV, gl_FrontMaterial.shininess);
+                            specular = gl_FrontMaterial.specular * pow(nDotV, gl_FrontMaterial.shininess);
                         }
                     }
 
                      // Define new render color
-                    lighting_color = ambient + diffuse + specular;
+                    lighting_color  = ambient + diffuse + specular;
                 }
 
                 return lighting_color;
@@ -1408,9 +1421,6 @@ fresnel_shader_lights ->
 
             void main()
             {
-                // Harmonization of the index of refraction
-                float Eta = 0.086 * IoR + 0.93;
-
                 vec3 reflectDir, refractDir;
                 reflectDir = normalize(reflect(viewWorld, normalWorld));
                 refractDir = normalize(refract(viewWorld, normalWorld, Eta));
@@ -1420,20 +1430,19 @@ fresnel_shader_lights ->
                 refractColor = textureCube(environmentMap, refractDir).xyz;
 
                 // Compute fresnel ratio
-                float fresnel = 0.1 + 2.0 * pow(1.0 + (dot(viewWorld, normalWorld)),
-                                                1.0 / (roughness * roughness_ratio));
+                float fresnel = pow(1.0 - (dot(-viewWorld, normalWorld)), 1.0 / (roughness * roughness_ratio));
 
                 // Compute final color
-                vec3 fresnelColor = mix(refractColor, reflectColor, clamp(fresnel, 0.0, 1.0));
-                vec3 renderColor  = computeRenderColor().rgb;
-                vec3 finalColor   = mix(fresnelColor, renderColor, ratio);
+                vec3 fresnelColor  = mix(refractColor, reflectColor, fresnel);
+                vec3 renderColor   = computeRenderColor().rgb;
+                vec3 finalColor    = mix(fresnelColor, renderColor, ratio);
 
 
                 gl_FragColor  = vec4(finalColor, 1.0);
             }
         >>
 
-    shader_set IoR            := FRESNEL_REFRACTION
+    shader_set Eta            := FRESNEL_REFRACTION
     shader_set ratio          := FRESNEL_RATIO
     shader_set roughness      := FRESNEL_ROUGHNESS
     shader_set environmentMap := texture_unit
@@ -1495,7 +1504,7 @@ fresnel_shader_no_lights ->
         >>
         fragment_shader <<
             // Material parameters
-            uniform float IoR; // Index of refraction
+            uniform float Eta; // Ratio of indices of refraction
             uniform float ratio;
             uniform float roughness;
             uniform samplerCube environmentMap;
@@ -1509,9 +1518,8 @@ fresnel_shader_no_lights ->
             const float roughness_ratio = 50.0;
 
             /**
-            * Compute render color according to materials,
-            * lights and colors parameters which are
-            * set in the current scene.
+            * Compute render color according to materials, lights and colors parameters
+            * which are set in the current scene.
             **/
             vec4 computeRenderColor()
             {
@@ -1541,8 +1549,7 @@ fresnel_shader_no_lights ->
                     if (nDotV > 0.0)
                     {
                         // Compute specular part
-                        specular = gl_FrontMaterial.specular
-                                 * pow(nDotV, gl_FrontMaterial.shininess);
+                        specular = gl_FrontMaterial.specular * pow(nDotV, gl_FrontMaterial.shininess);
                     }
                 }
 
@@ -1553,9 +1560,6 @@ fresnel_shader_no_lights ->
 
             void main()
             {
-                // Harmonization of the index of refraction
-                float Eta = 0.086 * IoR + 0.93;
-
                 vec3 reflectDir, refractDir;
                 reflectDir = normalize(reflect(viewWorld, normalWorld));
                 refractDir = normalize(refract(viewWorld, normalWorld, Eta));
@@ -1565,20 +1569,19 @@ fresnel_shader_no_lights ->
                 refractColor = textureCube(environmentMap, refractDir).xyz;
 
                 // Compute fresnel ratio
-                float fresnel = 0.1 + 2.0 * pow(1.0 - (dot(-viewWorld, normalWorld)),
-                                                1.0 / (roughness * roughness_ratio));
+                float fresnel = pow(1.0 - (dot(-viewWorld, normalWorld)), 1.0 / (roughness * roughness_ratio));
 
                 // Compute final color
-                vec3 fresnelColor = mix(refractColor, reflectColor, fresnel);
-                vec3 renderColor  = computeRenderColor().rgb;
-                vec3 finalColor   = mix(fresnelColor, renderColor, ratio);
+                vec3 fresnelColor  = mix(refractColor, reflectColor, fresnel);
+                vec3 renderColor   = computeRenderColor().rgb;
+                vec3 finalColor    = mix(fresnelColor, renderColor, ratio);
 
                  // Define new render color
-                gl_FragColor = vec4(finalColor, 1.0);
+                gl_FragColor  = vec4(finalColor, 1.0);
             }
         >>
 
-    shader_set IoR            := FRESNEL_REFRACTION
+    shader_set Eta            := FRESNEL_REFRACTION
     shader_set ratio          := FRESNEL_RATIO
     shader_set roughness      := FRESNEL_ROUGHNESS
     shader_set environmentMap := texture_unit
@@ -1714,7 +1717,7 @@ ruby ->
     material_diffuse 0.61424, 0.04136, 0.04136, 0.55
     material_specular 0.727811, 0.626959, 0.626959, 0.55
     material_shininess 76.8
-    fresnel_material 0.65, 1.757, 0.01
+    fresnel_material 0.7, 1.757, 0.01
 
 // -------------------------------------------------------------------------------------------------------------------
 //   JADE MATERIAL
