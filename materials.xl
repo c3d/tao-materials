@@ -41,10 +41,10 @@ plastic r:real, g:real, b:real ->
     PLASTIC_R := r
     PLASTIC_G := g
     PLASTIC_B := b
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        plastic_shader_lights
-    else
+    if SHADER4_AVAILABLE_MATERIALS = false then
         plastic_shader_no_lights
+    else
+        plastic_shader_lights
 
 plastic_shader_lights ->
     /**
@@ -282,10 +282,10 @@ marble scale:real ->
     // Default noise map 3D
     noise_map_3D 128, 128, 128
 
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        marble_shader_lights
-    else
+    if SHADER4_AVAILABLE_MATERIALS = false then
         marble_shader_no_lights
+    else
+        marble_shader_lights
 
 marble scale:real, seed:integer ->
     /**
@@ -296,10 +296,10 @@ marble scale:real, seed:integer ->
     // Default noise map 3D
     noise_map_3D 128, 128, seed
 
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        marble_shader_lights
-    else
+    if SHADER4_AVAILABLE_MATERIALS = false then
         marble_shader_no_lights
+    else
+        marble_shader_lights
 
 marble_shader_lights ->
     /**
@@ -618,10 +618,10 @@ granite scale:real ->
     // Default noise map 3D
     noise_map_3D 128, 128, 128
 
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        granite_shader_lights
-    else
+    if SHADER4_AVAILABLE_MATERIALS = false then
         granite_shader_no_lights
+    else
+        granite_shader_lights
 
 granite scale:real, seed:integer ->
     /**
@@ -635,10 +635,10 @@ granite scale:real, seed:integer ->
     // Default noise map 3D
     noise_map_3D 128, 128, seed
 
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        granite_shader_lights
-    else
+    if SHADER4_AVAILABLE_MATERIALS = false then
         granite_shader_no_lights
+    else
+        granite_shader_lights
 
 granite_shader_lights ->
     /**
@@ -961,10 +961,10 @@ wood scale:real ->
     // Default noise map 3D
     noise_map_3D 128, 128, 128
 
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        wood_shader_lights
-    else
+    if SHADER4_AVAILABLE_MATERIALS = false then
         wood_shader_no_lights
+    else
+        wood_shader_lights
 
 wood scale:real, ring:real, noise:real, seed:integer ->
     /**
@@ -977,10 +977,10 @@ wood scale:real, ring:real, noise:real, seed:integer ->
     // Default noise map 3D
     noise_map_3D 128, 128, seed
 
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        wood_shader_lights
-    else
+    if SHADER4_AVAILABLE_MATERIALS = false then
         wood_shader_no_lights
+    else
+        wood_shader_lights
 
 
 wood_shader_lights ->
@@ -1260,10 +1260,15 @@ fresnel_material r:real, n:real, roughness:real ->
     FRESNEL_RATIO := r
     FRESNEL_REFRACTION := n
     FRESNEL_ROUGHNESS  := roughness
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        fresnel_shader_lights
-    else
+
+    // This trick enables blur on pixels of the result texture
+    rotatex 0.05
+    rotatex -0.05
+
+    if SHADER4_AVAILABLE_MATERIALS = false then
         fresnel_shader_no_lights
+    else
+        fresnel_shader_lights
 
 fresnel_shader_lights ->
     /**
