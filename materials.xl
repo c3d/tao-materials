@@ -106,6 +106,9 @@ plastic_shader_lights ->
             **/
             vec4 computeRenderColor(vec4 renderColor)
             {
+                // Define a maximum of lights supported
+                int MAX_LIGHTS = 8;
+
                 vec4 lighting_color;
                 if(lights > 0)
                 {
@@ -117,7 +120,7 @@ plastic_shader_lights ->
                     vec4 specular = vec4(0.0);
                     ambient  = gl_FrontLightModelProduct.sceneColor;
 
-                    for(int i = 0; i < lights; i++)
+                    for(int i = 0; i < MAX_LIGHTS; i++)
                     {
                         if(bool(lights & (1 << i)))
                         {
@@ -1344,7 +1347,10 @@ fresnel_shader_lights ->
             * which are set in the current scene (Lambertian model).
             **/
             vec4 computeRenderColor()
-            {
+            {                           
+                // Define a maximum of lights supported
+                int MAX_LIGHTS = 8;
+
                 vec4 lighting_color;
                 vec3 N = normalize(normal);
                 vec3 V = normalize(viewDir);
@@ -1357,7 +1363,7 @@ fresnel_shader_lights ->
                 {
                     ambient  = gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient;
 
-                    for(int i = 0; i < lights; i++)
+                    for(int i = 0; i < MAX_LIGHTS; i++)
                     {
                         if(bool(lights & (1 << i)))
                         {
@@ -1723,7 +1729,7 @@ ruby ->
     material_diffuse 0.61424, 0.04136, 0.04136, 0.55
     material_specular 0.727811, 0.626959, 0.626959, 0.55
     material_shininess 76.8
-    fresnel_material 0.7, 1.757, 0.01
+    fresnel_material 0.65, 1.757, 0.01
 
 // -------------------------------------------------------------------------------------------------------------------
 //   JADE MATERIAL
