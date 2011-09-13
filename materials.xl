@@ -278,18 +278,7 @@ marble scale:real ->
     /**
     * Apply marble material.
     **/
-    MARBLE_SIZE := scale
-
-    // Rotation in order to enable pixel blur
-    rotatex 0.02
-
-    // Default noise map 3D
-    noise_map_3D 128, 128, 128
-
-    if SHADER4_AVAILABLE_MATERIALS = false then
-        marble_shader_no_lights
-    else
-        marble_shader_lights
+    marble scale, 128
 
 marble scale:real, seed:integer ->
     /**
@@ -299,6 +288,13 @@ marble scale:real, seed:integer ->
 
     // Default noise map 3D
     noise_map_3D 128, 128, seed
+
+    // Rotation in order to enable pixel blur
+    rotatex 0.05
+
+    // Force activation of the texture
+    // for object loader module
+    sphere 0, 0, 0, 1.0e-007
 
     if SHADER4_AVAILABLE_MATERIALS = false then
         marble_shader_no_lights
@@ -617,29 +613,25 @@ granite_third_color r1:real, g1:real, b1:real ->
 
 granite scale:real ->
     /**
-    * Apply granite material.
+    * Apply default granite material.
     **/
-    GRANITE_SIZE := scale
-
-    // Default noise map 3D
-    noise_map_3D 128, 128, 128
-
-    if SHADER4_AVAILABLE_MATERIALS = false then
-        granite_shader_no_lights
-    else
-        granite_shader_lights
+    granite scale, 128
 
 granite scale:real, seed:integer ->
     /**
     * Apply granite material.
     **/
-    granite_SIZE := scale
-
-    // Rotation in order to enable pixel blur
-    rotatex 0.02
+    GRANITE_SIZE := scale
 
     // Default noise map 3D
     noise_map_3D 128, 128, seed
+
+    // Rotation in order to enable pixel blur
+    rotatex 0.05
+
+    // Force activation of the texture
+    // for object loader module
+    sphere 0, 0, 0, 1.0e-007
 
     if SHADER4_AVAILABLE_MATERIALS = false then
         granite_shader_no_lights
@@ -959,20 +951,7 @@ wood scale:real ->
     /**
     * Apply wood material.
     **/
-    WOOD_SIZE   := scale
-    RING_SIZE   := 20.0
-    NOISE_RATIO := 0.87
-
-    // Rotation in order to enable pixel blur
-    rotatex 0.02
-
-    // Default noise map 3D
-    noise_map_3D 128, 128, 128
-
-    if SHADER4_AVAILABLE_MATERIALS = false then
-        wood_shader_no_lights
-    else
-        wood_shader_lights
+    wood scale, 20.0, 0.87, 128
 
 wood scale:real, ring:real, noise:real, seed:integer ->
     /**
@@ -984,6 +963,13 @@ wood scale:real, ring:real, noise:real, seed:integer ->
 
     // Default noise map 3D
     noise_map_3D 128, 128, seed
+
+    // Rotation in order to enable pixel blur
+    rotatex 0.05
+
+    // Force activation of the texture
+    // for object loader module
+    sphere 0, 0, 0, 1.0e-007
 
     if SHADER4_AVAILABLE_MATERIALS = false then
         wood_shader_no_lights
