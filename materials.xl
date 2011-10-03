@@ -83,7 +83,7 @@ plastic_shader_lights ->
                normal   =  normalize(normalMatrix * gl_Normal);
                viewDir  = -normalize((modelMatrix * gl_Vertex).xyz);
 
-               vec3 eyePos = normalize(camera + viewDir);
+               vec3 eyePos   = normalize(camera + viewDir);
                ratio = 0.5 * (1.0 + dot(eyePos, normal));
 
                normal   =  normalize(gl_NormalMatrix * gl_Normal);
@@ -383,7 +383,7 @@ marble_shader_lights ->
                     }
 
                      // Define new render color
-                    lighting_color = (ambient + diffuse) * renderColor + specular;
+                    lighting_color  = (ambient + diffuse) * renderColor + specular;
                 }
                 else
                 {
@@ -412,7 +412,7 @@ marble_shader_lights ->
                     }
 
                      // Define new render color
-                    lighting_color = (ambient + diffuse) * renderColor + specular;
+                    lighting_color  = (ambient + diffuse) * renderColor + specular;
 
                 }
 
@@ -519,7 +519,7 @@ marble_shader_no_lights ->
                 }
 
                  // Define new render color
-                lighting_color = (ambient + diffuse) * renderColor + specular;
+                lighting_color  = (ambient + diffuse) * renderColor + specular;
 
                 return lighting_color;
             }
@@ -716,7 +716,7 @@ granite_shader_lights ->
                     }
 
                      // Define new render color
-                    lighting_color = (ambient + diffuse) * renderColor + specular;
+                    lighting_color  = (ambient + diffuse) * renderColor + specular;
                 }
                 else
                 {
@@ -745,7 +745,7 @@ granite_shader_lights ->
                     }
 
                      // Define new render color
-                    lighting_color = (ambient + diffuse) * renderColor + specular;
+                    lighting_color  = (ambient + diffuse) * renderColor + specular;
 
                 }
 
@@ -856,7 +856,7 @@ granite_shader_no_lights ->
                 }
 
                  // Define new render color
-                lighting_color = (ambient + diffuse) * renderColor + specular;
+                lighting_color  = (ambient + diffuse) * renderColor + specular;
 
                 return lighting_color;
             }
@@ -876,10 +876,10 @@ granite_shader_no_lights ->
                 }
 
                 // Compute vein ratio
-                float veinRatio = clamp(5.0 * (0.5 + turbulence.x) - 1.5, 0.0, 1.0);
+                float veinRatio = clamp(5.0 * (0.5 + turbulence.y) - 1.5, 0.0, 1.0);
 
                 // Compute final ratio
-                float ratio = 5.0 * abs(turbulence.y);
+                float ratio = 5.0 * abs(turbulence.x);
 
                 vec3 mainColor = mix(first_color, mix(third_color, second_color, veinRatio), ratio);
                 gl_FragColor = computeRenderColor(vec4(mainColor, 1.0));
@@ -1054,7 +1054,7 @@ wood_shader_lights ->
                     }
 
                      // Define new render color
-                    lighting_color = (ambient + diffuse) * renderColor + specular;
+                    lighting_color  = (ambient + diffuse) * renderColor + specular;
                 }
                 else
                 {
@@ -1083,7 +1083,7 @@ wood_shader_lights ->
                     }
 
                      // Define new render color
-                    lighting_color = (ambient + diffuse) * renderColor + specular;
+                    lighting_color  = (ambient + diffuse) * renderColor + specular;
 
                 }
 
@@ -1096,8 +1096,9 @@ wood_shader_lights ->
                float noise   = texture3D(noiseMap, texCoord).x - 1.0;
 
                // Define some rings in the wood
-               float rings = fract(ringSize * gl_TexCoord[0].x + noiseRatio * noise);
-               float ratio = (rings - pow(rings, 20.0));
+               float f = fract(ringSize * gl_TexCoord[0].x + noiseRatio * noise);
+
+               float ratio  = (f - pow(f, 20.0));
 
                vec3 mainColor = mix(first_color, second_color, ratio);
                gl_FragColor   = computeRenderColor(vec4(mainColor, 1.0));
@@ -1184,7 +1185,7 @@ wood_shader_no_lights ->
                 }
 
                  // Define new render color
-                lighting_color = (ambient + diffuse) * renderColor + specular;
+                lighting_color  = (ambient + diffuse) * renderColor + specular;
 
                 return lighting_color;
             }
@@ -1195,8 +1196,9 @@ wood_shader_no_lights ->
                float noise   = texture3D(noiseMap, texCoord).x - 1.0;
 
                // Define some rings in the wood
-               float rings = fract(ringSize * gl_TexCoord[0].x + noiseRatio * noise);
-               float ratio = (rings - pow(rings, 20.0));
+               float f = fract(ringSize * gl_TexCoord[0].x + noiseRatio * noise);
+
+               float ratio  = (f - pow(f, 20.0));
 
                vec3 mainColor = mix(first_color, second_color, ratio);
                gl_FragColor   = computeRenderColor(vec4(mainColor, 1.0));
