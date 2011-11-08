@@ -19,13 +19,13 @@
 /**
  * Defines a sort of plastic material.
  *
- * Set a sort of plastic material, whose color is defined by @ref graph.doxy.h::color(r:real,g:real,b:real,a:real).
+ * Set a sort of plastic material, whose color is defined by (@p r, @p g, @p b).
  *
  * @note This material act as a simple texture.
  * @note There is no one reflection on this material.
  *
  */
-plastic();
+plastic(r:real, g:real, b:real);
 
 /**
  * Defines the first color of the marble material.
