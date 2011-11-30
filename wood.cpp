@@ -274,21 +274,20 @@ Wood::Wood(uint unit, float scale, float ring, float noise)
             pgm = NULL;
             failed = true;
         }
-        else
-        {
-            pgm->link();
 
-            // Save uniform locations
-            uint id = pgm->programId();
 
-            uniforms["scale"] = glGetUniformLocation(id, "scale");
-            uniforms["lights"] = glGetUniformLocation(id, "lights");
-            uniforms["ringSize"] = glGetUniformLocation(id, "ringSize");
-            uniforms["noiseMap"] = glGetUniformLocation(id, "noiseMap");
-            uniforms["noiseRatio"] = glGetUniformLocation(id, "noiseRatio");
-            uniforms["first_color"] = glGetUniformLocation(id, "first_color");
-            uniforms["second_color"] = glGetUniformLocation(id, "second_color");
-        }
+        pgm->link();
+
+        // Save uniform locations
+        uint id = pgm->programId();
+
+        uniforms["scale"] = glGetUniformLocation(id, "scale");
+        uniforms["lights"] = glGetUniformLocation(id, "lights");
+        uniforms["ringSize"] = glGetUniformLocation(id, "ringSize");
+        uniforms["noiseMap"] = glGetUniformLocation(id, "noiseMap");
+        uniforms["noiseRatio"] = glGetUniformLocation(id, "noiseRatio");
+        uniforms["first_color"] = glGetUniformLocation(id, "first_color");
+        uniforms["second_color"] = glGetUniformLocation(id, "second_color");
     }
 }
 
@@ -363,10 +362,7 @@ void Wood::Draw()
     if (!licensed && !tao->blink(1.0, 0.2))
         return;
 
-    uint prg_id = 0;
-    if(pgm)
-        prg_id = pgm->programId();
-
+    uint prg_id = pgm->programId();
     if(prg_id)
     {
         // Set shader

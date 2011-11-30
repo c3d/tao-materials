@@ -296,20 +296,19 @@ Granite::Granite(uint unit, float scale)
             pgm = NULL;
             failed = true;
         }
-        else
-        {
-            pgm->link();
 
-            // Save uniform locations
-            uint id = pgm->programId();
 
-            uniforms["scale"] = glGetUniformLocation(id, "scale");
-            uniforms["lights"] = glGetUniformLocation(id, "lights");
-            uniforms["noiseMap"] = glGetUniformLocation(id, "noiseMap");
-            uniforms["first_color"] = glGetUniformLocation(id, "first_color");
-            uniforms["second_color"] = glGetUniformLocation(id, "second_color");
-            uniforms["third_color"] = glGetUniformLocation(id, "third_color");
-        }
+        pgm->link();
+
+        // Save uniform locations
+        uint id = pgm->programId();
+
+        uniforms["scale"] = glGetUniformLocation(id, "scale");
+        uniforms["lights"] = glGetUniformLocation(id, "lights");
+        uniforms["noiseMap"] = glGetUniformLocation(id, "noiseMap");
+        uniforms["first_color"] = glGetUniformLocation(id, "first_color");
+        uniforms["second_color"] = glGetUniformLocation(id, "second_color");
+        uniforms["third_color"] = glGetUniformLocation(id, "third_color");
     }
 }
 
@@ -395,10 +394,7 @@ void Granite::Draw()
     if (!licensed && !tao->blink(1.0, 0.2))
         return;
 
-    uint prg_id = 0;
-    if(pgm)
-        prg_id = pgm->programId();
-
+    uint prg_id = pgm->programId();
     if(prg_id)
     {
         // Set shader
