@@ -377,6 +377,7 @@ void Fresnel::identify_callback(void *arg)
 //   Identify callback: don't do anything
 // ----------------------------------------------------------------------------
 {
+    (void) arg;
 }
 
 
