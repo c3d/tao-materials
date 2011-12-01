@@ -334,19 +334,21 @@ Fresnel::Fresnel(uint unit, float IoR, float ratio, float roughness)
             pgm = NULL;
             failed = true;
         }
+        else
+        {
+            pgm->link();
 
-        pgm->link();
+            // Save uniform locations
+            uint id = pgm->programId();
 
-        // Save uniform locations
-        uint id = pgm->programId();
-
-        uniforms["IoR"] = glGetUniformLocation(id, "IoR");
-        uniforms["ratio"] = glGetUniformLocation(id, "ratio");
-        uniforms["lights"] = glGetUniformLocation(id, "lights");
-        uniforms["roughness"] = glGetUniformLocation(id, "roughness");
-        uniforms["environmentMap"] = glGetUniformLocation(id, "environmentMap");
-        uniforms["camera"] = glGetUniformLocation(id, "camera");
-        uniforms["modelMatrix"] = glGetUniformLocation(id, "modelMatrix");
+            uniforms["IoR"] = glGetUniformLocation(id, "IoR");
+            uniforms["ratio"] = glGetUniformLocation(id, "ratio");
+            uniforms["lights"] = glGetUniformLocation(id, "lights");
+            uniforms["roughness"] = glGetUniformLocation(id, "roughness");
+            uniforms["environmentMap"] = glGetUniformLocation(id, "environmentMap");
+            uniforms["camera"] = glGetUniformLocation(id, "camera");
+            uniforms["modelMatrix"] = glGetUniformLocation(id, "modelMatrix");
+        }
     }
 
     // Get model matrix
@@ -403,7 +405,10 @@ void Fresnel::Draw()
     if (!licensed && !tao->blink(1.0, 0.2))
         return;
 
-    uint prg_id = pgm->programId();
+    uint prg_id = 0;
+    if(pgm)
+        prg_id = pgm->programId();
+
     if(prg_id)
     {
         // Set shader

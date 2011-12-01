@@ -236,17 +236,18 @@ Plastic::Plastic()
             pgm = NULL;
             failed = true;
         }
+        else
+        {
+            pgm->link();
 
+            // Save uniform locations
+            uint id = pgm->programId();
 
-        pgm->link();
-
-        // Save uniform locations
-        uint id = pgm->programId();
-
-        uniforms["color"] = glGetUniformLocation(id, "color");
-        uniforms["lights"] = glGetUniformLocation(id, "lights");
-        uniforms["camera"] = glGetUniformLocation(id, "camera");
-        uniforms["modelMatrix"] = glGetUniformLocation(id, "modelMatrix");
+            uniforms["color"] = glGetUniformLocation(id, "color");
+            uniforms["lights"] = glGetUniformLocation(id, "lights");
+            uniforms["camera"] = glGetUniformLocation(id, "camera");
+            uniforms["modelMatrix"] = glGetUniformLocation(id, "modelMatrix");
+        }
     }
 
     // Get model matrix
@@ -314,7 +315,10 @@ void Plastic::Draw()
     if (!licensed && !tao->blink(1.0, 0.2))
         return;
 
-    uint prg_id = pgm->programId();
+    uint prg_id = 0;
+    if(pgm)
+        prg_id = pgm->programId();
+
     if(prg_id)
     {
         // Set shader
