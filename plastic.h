@@ -35,6 +35,8 @@ struct Plastic : public Material
     Plastic();
     ~Plastic();
 
+    void setColor(GLfloat r, GLfloat g, GLfloat b);
+
     // Draw plastic material
     virtual void    Draw();
 
@@ -43,6 +45,7 @@ struct Plastic : public Material
     static void     delete_callback(void *arg);
 
 private:
+    GLfloat color[3];    // plastic color
     GLfloat model[4][4]; // model matrix
 
     static bool failed;
