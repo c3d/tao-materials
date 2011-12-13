@@ -1,8 +1,8 @@
 # ******************************************************************************
-#  filters.pro                                                  Tao project
+#  materials.pro                                                     Tao project
 # ******************************************************************************
 # File Description:
-# Qt build file for the Filters module
+# Qt build file for the Materials module
 # ******************************************************************************
 # This software is property of Taodyne SAS - Confidential
 # Ce logiciel est la propriété de Taodyne SAS - Confidentiel
@@ -14,7 +14,54 @@ MODINSTDIR = materials
 
 include(../modules.pri)
 
-OTHER_FILES = materials.xl
+OTHER_FILES = materials.xl materials.tbl traces.tbl
 
-INSTALLS    -= thismod_bin
+DEFINES     += GLEW_STATIC
+
+INCLUDEPATH += $${TAOTOPSRC}/tao/include/tao/
+HEADERS = \
+    fresnel.h \
+    materials.h \
+    material.h \
+    plastic.h \
+    wood.h  \
+    granite.h \
+    marble.h \
+
+SOURCES = $${TAOTOPSRC}/tao/include/tao/GL/glew.c \
+    fresnel.cpp \
+    materials.cpp \
+    material.cpp \
+    plastic.cpp \
+    wood.cpp \
+    granite.cpp \
+    marble.cpp \
+
+TBL_SOURCES  = materials.tbl
+
+QT          += core \
+               gui \
+               opengl
+
 INSTALLS    += thismod_icon
+
+LICENSE_FILES = materials.taokey.notsigned
+include(../licenses.pri)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
