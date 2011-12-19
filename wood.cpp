@@ -43,6 +43,19 @@ Wood::Wood(uint unit, float scale, float ring, float noise)
 
         // Basic vertex shader
         static string vSrc =
+                "/********************************************************************************\n"
+                "**                                                                               \n"
+                "** Copyright (C) 2011 Taodyne.                                                   \n"
+                "** All rights reserved.                                                          \n"
+                "** Contact: Taodyne (contact@taodyne.com)                                        \n"
+                "**                                                                               \n"
+                "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
+                "** It can be only used in the software and these modules.                        \n"
+                "**                                                                               \n"
+                "** If you have questions regarding the use of this file, please contact          \n"
+                "** Taodyne at contact@taodyne.com.                                               \n"
+                "**                                                                               \n"
+                "********************************************************************************/\n"
                 "varying vec3 viewDir;"
                 "varying vec3 normal;"
 
@@ -66,6 +79,19 @@ Wood::Wood(uint unit, float scale, float ring, float noise)
             // If the extension is available, use this fragment shader
             // to handle multiple lights
             fSrc =
+               "/********************************************************************************\n"
+               "**                                                                               \n"
+               "** Copyright (C) 2011 Taodyne.                                                   \n"
+               "** All rights reserved.                                                          \n"
+               "** Contact: Taodyne (contact@taodyne.com)                                        \n"
+               "**                                                                               \n"
+               "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
+               "** It can be only used in the software and these modules.                        \n"
+               "**                                                                               \n"
+               "** If you have questions regarding the use of this file, please contact          \n"
+               "** Taodyne at contact@taodyne.com.                                               \n"
+               "**                                                                               \n"
+               "********************************************************************************/\n"
                "#extension GL_EXT_gpu_shader4 : require\n"
 
                "uniform vec3      first_color;"
@@ -185,6 +211,19 @@ Wood::Wood(uint unit, float scale, float ring, float noise)
             // If the extension is not available, use this fragment shader
             // to handle an unique light.
             fSrc =
+               "/********************************************************************************\n"
+               "**                                                                               \n"
+               "** Copyright (C) 2011 Taodyne.                                                   \n"
+               "** All rights reserved.                                                          \n"
+               "** Contact: Taodyne (contact@taodyne.com)                                        \n"
+               "**                                                                               \n"
+               "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
+               "** It can be only used in the software and these modules.                        \n"
+               "**                                                                               \n"
+               "** If you have questions regarding the use of this file, please contact          \n"
+               "** Taodyne at contact@taodyne.com.                                               \n"
+               "**                                                                               \n"
+               "********************************************************************************/\n"
                "uniform vec3      first_color;"
                "uniform vec3      second_color;"
                "uniform sampler3D noiseMap;"
