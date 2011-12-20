@@ -29,143 +29,20 @@
 bool                  Fresnel::failed = false;
 QGLShaderProgram*     Fresnel::pgm = NULL;
 std::map<text, GLint> Fresnel::uniforms;
-const QGLContext*     Fresnel::context = NULL;
 
 Fresnel::Fresnel(uint unit, float IoR, float ratio, float roughness)
 // ----------------------------------------------------------------------------
 //   Construction
 // ----------------------------------------------------------------------------
-    : Material(&context),
-      unit(unit), IoR(IoR), ratio(ratio), roughness(roughness)
+    : unit(unit), IoR(IoR), ratio(ratio), roughness(roughness)
 {
-    IFTRACE(materials)
-            debug() << "Create fresnel material" << "\n";
-
-    checkGLContext();
-
-    // Get model matrix
-    Matrix4 m = tao->ModelMatrix();
-    std::copy(m.Data(), m.Data() + 16, model[0]);
-}
-
-
-Fresnel::~Fresnel()
-// ----------------------------------------------------------------------------
-//   Destruction
-// ----------------------------------------------------------------------------
-{
-}
-
-
-void Fresnel::render_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Rendering callback: call the render function for the object
-// ----------------------------------------------------------------------------
-{
-    ((Fresnel *)arg)->Draw();
-}
-
-
-void Fresnel::identify_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Identify callback: don't do anything
-// ----------------------------------------------------------------------------
-{
-    (void) arg;
-}
-
-
-void Fresnel::delete_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Delete callback: destroy object
-// ----------------------------------------------------------------------------
-{
-    delete (Fresnel *)arg;
-}
-
-
-void Fresnel::Draw()
-// ----------------------------------------------------------------------------
-//   Apply fresnel material
-// ----------------------------------------------------------------------------
-{
-    if (!tested)
+    if(!pgm && !failed)
     {
-        licensed = tao->checkImpressOrLicense("Materials 1.0");
-        tested = true;
-    }
-    if (!licensed && !tao->blink(1.0, 0.2, 300.0))
-        return;
-
-    checkGLContext();
-
-    uint prg_id = 0;
-    if(pgm)
-        prg_id = pgm->programId();
-
-    if(prg_id)
-    {
-        IFTRACE(materials)
-                debug() << "Apply fresnel material" << "\n";
-
-        // Set shader
-        tao->SetShader(prg_id);
-
-        // Activate pixel blur
-        tao->HasPixelBlur(true);
-
-        // Set uniform values
-        glUniform1i(uniforms["environmentMap"], unit);
-        glUniform1f(uniforms["IoR"], IoR);
-        glUniform1f(uniforms["ratio"], ratio);
-        glUniform1f(uniforms["roughness"], roughness);
-        glUniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
-
-        // Get and set camera position
-        Vector3 cam;
-        tao->getCamera(&cam, NULL, NULL, NULL);
-        GLfloat camera[3] = {cam.x, cam.y, cam.z};
-        glUniform3fv(uniforms["camera"], 1, camera);
-
-        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
-        {
-            GLint lightsmask = tao->EnabledLights();
-            glUniform1i(uniforms["lights"], lightsmask);
-        }
-    }
-}
-
-
-void Fresnel::createShaders()
-// ----------------------------------------------------------------------------
-//   Create shader programs
-// ----------------------------------------------------------------------------
-{
-    if(!failed)
-    {
-        delete pgm;
-
-        IFTRACE(materials)
-                debug() << "Create fresnel shader" << "\n";
-
-        pgm = new QGLShaderProgram(*pcontext);
+        pgm = new QGLShaderProgram();
         bool ok = false;
 
         // Basic vertex shader
         static string vSrc =
-                "/********************************************************************************\n"
-                "**                                                                               \n"
-                "** Copyright (C) 2011 Taodyne.                                                   \n"
-                "** All rights reserved.                                                          \n"
-                "** Contact: Taodyne (contact@taodyne.com)                                        \n"
-                "**                                                                               \n"
-                "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
-                "** It can be only used in the software and these modules.                        \n"
-                "**                                                                               \n"
-                "** If you have questions regarding the use of this file, please contact          \n"
-                "** Taodyne at contact@taodyne.com.                                               \n"
-                "**                                                                               \n"
-                "********************************************************************************/\n"
                 "uniform vec3 camera;"
                 "uniform mat4 modelMatrix;"
 
@@ -212,21 +89,7 @@ void Fresnel::createShaders()
         {
             // If the extension is available, use this shader
             // to handle multiple lights
-            fSrc =
-                    "/********************************************************************************\n"
-                    "**                                                                               \n"
-                    "** Copyright (C) 2011 Taodyne.                                                   \n"
-                    "** All rights reserved.                                                          \n"
-                    "** Contact: Taodyne (contact@taodyne.com)                                        \n"
-                    "**                                                                               \n"
-                    "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
-                    "** It can be only used in the software and these modules.                        \n"
-                    "**                                                                               \n"
-                    "** If you have questions regarding the use of this file, please contact          \n"
-                    "** Taodyne at contact@taodyne.com.                                               \n"
-                    "**                                                                               \n"
-                    "********************************************************************************/\n"
-                    "#extension GL_EXT_gpu_shader4 : require\n"
+            fSrc =  "#extension GL_EXT_gpu_shader4 : require\n"
 
                     "/* Material parameters */"
                     "uniform float IoR;" // Index of refraction
@@ -365,19 +228,6 @@ void Fresnel::createShaders()
             // If the extension is not available, use this shader
             // to handle an unique light.
             fSrc =
-                    "/********************************************************************************\n"
-                    "**                                                                               \n"
-                    "** Copyright (C) 2011 Taodyne.                                                   \n"
-                    "** All rights reserved.                                                          \n"
-                    "** Contact: Taodyne (contact@taodyne.com)                                        \n"
-                    "**                                                                               \n"
-                    "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
-                    "** It can be only used in the software and these modules.                        \n"
-                    "**                                                                               \n"
-                    "** If you have questions regarding the use of this file, please contact          \n"
-                    "** Taodyne at contact@taodyne.com.                                               \n"
-                    "**                                                                               \n"
-                    "********************************************************************************/\n"
                     "/* Material parameters */"
                     "uniform float IoR;" // Index of refraction
                     "uniform float ratio;"
@@ -500,4 +350,91 @@ void Fresnel::createShaders()
             uniforms["modelMatrix"] = glGetUniformLocation(id, "modelMatrix");
         }
     }
+
+    // Get model matrix
+    Matrix4 m = tao->ModelMatrix();
+    std::copy(m.Data(), m.Data() + 16, model[0]);
 }
+
+
+Fresnel::~Fresnel()
+// ----------------------------------------------------------------------------
+//   Destruction
+// ----------------------------------------------------------------------------
+{
+}
+
+
+void Fresnel::render_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Rendering callback: call the render function for the object
+// ----------------------------------------------------------------------------
+{
+    ((Fresnel *)arg)->Draw();
+}
+
+
+void Fresnel::identify_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Identify callback: don't do anything
+// ----------------------------------------------------------------------------
+{
+    (void) arg;
+}
+
+
+void Fresnel::delete_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Delete callback: destroy object
+// ----------------------------------------------------------------------------
+{
+    delete (Fresnel *)arg;
+}
+
+
+void Fresnel::Draw()
+// ----------------------------------------------------------------------------
+//   Apply fresnel material
+// ----------------------------------------------------------------------------
+{
+    if (!tested)
+    {
+        licensed = tao->checkLicense("Materials 1.0", false);
+        tested = true;
+    }
+    if (!licensed && !tao->blink(1.0, 0.2))
+        return;
+
+    uint prg_id = 0;
+    if(pgm)
+        prg_id = pgm->programId();
+
+    if(prg_id)
+    {
+        // Set shader
+        tao->SetShader(prg_id);
+
+        // Activate pixel blur
+        tao->HasPixelBlur(true);
+
+        // Set uniform values
+        glUniform1i(uniforms["environmentMap"], unit);
+        glUniform1f(uniforms["IoR"], IoR);
+        glUniform1f(uniforms["ratio"], ratio);
+        glUniform1f(uniforms["roughness"], roughness);
+        glUniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
+
+        // Get and set camera position
+        Vector3 cam;
+        tao->getCamera(&cam, NULL, NULL);
+        GLfloat camera[3] = {cam.x, cam.y, cam.z};
+        glUniform3fv(uniforms["camera"], 1, camera);
+
+        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
+        {
+            GLint lightsmask = tao->EnabledLights();
+            glUniform1i(uniforms["lights"], lightsmask);
+        }
+    }
+}
+

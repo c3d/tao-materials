@@ -29,151 +29,20 @@
 bool                  Marble::failed = false;
 QGLShaderProgram*     Marble::pgm = NULL;
 std::map<text, GLint> Marble::uniforms;
-const QGLContext*     Marble::context = NULL;
 
 Marble::Marble(uint unit, float scale)
 // ----------------------------------------------------------------------------
 //   Construction
 // ----------------------------------------------------------------------------
-    : Material(&context), unit(unit), scale(scale)
+    : unit(unit), scale(scale)
 {
-    IFTRACE(materials)
-            debug() << "Create marble material" << "\n";
-
-    checkGLContext();
-}
-
-
-Marble::~Marble()
-// ----------------------------------------------------------------------------
-//   Destruction
-// ----------------------------------------------------------------------------
-{
-}
-
-
-void Marble::setFirstColor(GLfloat color[3])
-// ----------------------------------------------------------------------------
-//   Set first marble color
-// ----------------------------------------------------------------------------
-{
-    first_color[0] = color[0];
-    first_color[1] = color[1];
-    first_color[2] = color[2];
-}
-
-
-void Marble::setSecondColor(GLfloat color[3])
-// ----------------------------------------------------------------------------
-//   Set second marble color
-// ----------------------------------------------------------------------------
-{
-    second_color[0] = color[0];
-    second_color[1] = color[1];
-    second_color[2] = color[2];
-}
-
-
-void Marble::render_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Rendering callback: call the render function for the object
-// ----------------------------------------------------------------------------
-{
-    ((Marble *)arg)->Draw();
-}
-
-
-void Marble::identify_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Identify callback: don't do anything
-// ----------------------------------------------------------------------------
-{
-    (void) arg;
-}
-
-
-void Marble::delete_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Delete callback: destroy object
-// ----------------------------------------------------------------------------
-{
-    delete (Marble *)arg;
-}
-
-
-void Marble::Draw()
-// ----------------------------------------------------------------------------
-//   Apply marble material
-// ----------------------------------------------------------------------------
-{
-    if (!tested)
+    if(!pgm && !failed)
     {
-        licensed = tao->checkImpressOrLicense("Materials 1.0");
-        tested = true;
-    }
-    if (!licensed && !tao->blink(1.0, 0.2, 300.0))
-        return;
-
-    checkGLContext();
-
-    uint prg_id = 0;
-    if(pgm)
-        prg_id = pgm->programId();
-
-    if(prg_id)
-    {
-        IFTRACE(materials)
-                debug() << "Apply marble material" << "\n";
-
-        // Set shader
-        tao->SetShader(prg_id);
-
-        // Set uniform values
-        glUniform1i(uniforms["noiseMap"], unit);
-
-        glUniform1f(uniforms["scale"], scale);
-        glUniform3fv(uniforms["first_color"], 1, first_color);
-        glUniform3fv(uniforms["second_color"], 1, second_color);
-
-        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
-        {
-            GLint lightsmask = tao->EnabledLights();
-            glUniform1i(uniforms["lights"], lightsmask);
-        }
-    }
-}
-
-
-void Marble::createShaders()
-// ----------------------------------------------------------------------------
-//   Create shader programs
-// ----------------------------------------------------------------------------
-{
-    if(!failed)
-    {
-        delete pgm;
-
-        IFTRACE(materials)
-                debug() << "Create marble shader" << "\n";
-
-        pgm = new QGLShaderProgram(*pcontext);
+        pgm = new QGLShaderProgram();
         bool ok = false;
 
         // Basic vertex shader
         static string vSrc =
-                "/********************************************************************************\n"
-                "**                                                                               \n"
-                "** Copyright (C) 2011 Taodyne.                                                   \n"
-                "** All rights reserved.                                                          \n"
-                "** Contact: Taodyne (contact@taodyne.com)                                        \n"
-                "**                                                                               \n"
-                "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
-                "** It can be only used in the software and these modules.                        \n"
-                "**                                                                               \n"
-                "** If you have questions regarding the use of this file, please contact          \n"
-                "** Taodyne at contact@taodyne.com.                                               \n"
-                "**                                                                               \n"
-                "********************************************************************************/\n"
                 "varying vec3 viewDir;"
                 "varying vec3 normal;"
 
@@ -197,19 +66,6 @@ void Marble::createShaders()
             // If the extension is available, use this fragment shader
             // to handle multiple lights
             fSrc =
-               "/********************************************************************************\n"
-               "**                                                                               \n"
-               "** Copyright (C) 2011 Taodyne.                                                   \n"
-               "** All rights reserved.                                                          \n"
-               "** Contact: Taodyne (contact@taodyne.com)                                        \n"
-               "**                                                                               \n"
-               "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
-               "** It can be only used in the software and these modules.                        \n"
-               "**                                                                               \n"
-               "** If you have questions regarding the use of this file, please contact          \n"
-               "** Taodyne at contact@taodyne.com.                                               \n"
-               "**                                                                               \n"
-               "********************************************************************************/\n"
                "#extension GL_EXT_gpu_shader4 : require\n"
 
                "uniform vec3      first_color;"
@@ -336,19 +192,6 @@ void Marble::createShaders()
             // If the extension is not available, use this fragment shader
             // to handle an unique light.
             fSrc =
-               "/********************************************************************************\n"
-               "**                                                                               \n"
-               "** Copyright (C) 2011 Taodyne.                                                   \n"
-               "** All rights reserved.                                                          \n"
-               "** Contact: Taodyne (contact@taodyne.com)                                        \n"
-               "**                                                                               \n"
-               "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
-               "** It can be only used in the software and these modules.                        \n"
-               "**                                                                               \n"
-               "** If you have questions regarding the use of this file, please contact          \n"
-               "** Taodyne at contact@taodyne.com.                                               \n"
-               "**                                                                               \n"
-               "********************************************************************************/\n"
                "uniform vec3      first_color;"
                "uniform vec3      second_color;"
                "uniform vec3      third_color;"
@@ -462,3 +305,99 @@ void Marble::createShaders()
         }
     }
 }
+
+
+Marble::~Marble()
+// ----------------------------------------------------------------------------
+//   Destruction
+// ----------------------------------------------------------------------------
+{
+}
+
+
+void Marble::setFirstColor(GLfloat color[3])
+// ----------------------------------------------------------------------------
+//   Set first marble color
+// ----------------------------------------------------------------------------
+{
+    first_color[0] = color[0];
+    first_color[1] = color[1];
+    first_color[2] = color[2];
+}
+
+
+void Marble::setSecondColor(GLfloat color[3])
+// ----------------------------------------------------------------------------
+//   Set second marble color
+// ----------------------------------------------------------------------------
+{
+    second_color[0] = color[0];
+    second_color[1] = color[1];
+    second_color[2] = color[2];
+}
+
+
+void Marble::render_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Rendering callback: call the render function for the object
+// ----------------------------------------------------------------------------
+{
+    ((Marble *)arg)->Draw();
+}
+
+
+void Marble::identify_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Identify callback: don't do anything
+// ----------------------------------------------------------------------------
+{
+    (void) arg;
+}
+
+
+void Marble::delete_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Delete callback: destroy object
+// ----------------------------------------------------------------------------
+{
+    delete (Marble *)arg;
+}
+
+
+void Marble::Draw()
+// ----------------------------------------------------------------------------
+//   Apply marble material
+// ----------------------------------------------------------------------------
+{
+    if (!tested)
+    {
+        licensed = tao->checkLicense("Materials 1.0", false);
+        tested = true;
+    }
+    if (!licensed && !tao->blink(1.0, 0.2))
+        return;
+
+    uint prg_id = 0;
+    if(pgm)
+        prg_id = pgm->programId();
+
+    if(prg_id)
+    {
+        // Set shader
+        tao->SetShader(prg_id);
+
+        // Set uniform values
+        glUniform1i(uniforms["noiseMap"], unit);
+
+        glUniform1f(uniforms["scale"], scale);
+        glUniform3fv(uniforms["first_color"], 1, first_color);
+        glUniform3fv(uniforms["second_color"], 1, second_color);
+
+        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
+        {
+            GLint lightsmask = tao->EnabledLights();
+            glUniform1i(uniforms["lights"], lightsmask);
+        }
+    }
+}
+

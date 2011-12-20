@@ -29,146 +29,20 @@
 bool                  Wood::failed = false;
 QGLShaderProgram*     Wood::pgm = NULL;
 std::map<text, GLint> Wood::uniforms;
-const QGLContext*     Wood::context = NULL;
 
 Wood::Wood(uint unit, float scale, float ring, float noise)
 // ----------------------------------------------------------------------------
 //   Construction
 // ----------------------------------------------------------------------------
-    : Material(&context), unit(unit), scale(scale), ring(ring), noise(noise)
+    : unit(unit), scale(scale), ring(ring), noise(noise)
 {
-    checkGLContext();
-}
-
-
-Wood::~Wood()
-// ----------------------------------------------------------------------------
-//   Destruction
-// ----------------------------------------------------------------------------
-{
-}
-
-
-void Wood::setFirstColor(GLfloat color[3])
-// ----------------------------------------------------------------------------
-//   Set first wood color
-// ----------------------------------------------------------------------------
-{
-    first_color[0] = color[0];
-    first_color[1] = color[1];
-    first_color[2] = color[2];
-}
-
-
-void Wood::setSecondColor(GLfloat color[3])
-// ----------------------------------------------------------------------------
-//   Set second wood color
-// ----------------------------------------------------------------------------
-{
-    second_color[0] = color[0];
-    second_color[1] = color[1];
-    second_color[2] = color[2];
-}
-
-
-void Wood::render_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Rendering callback: call the render function for the object
-// ----------------------------------------------------------------------------
-{
-    ((Wood *)arg)->Draw();
-}
-
-
-void Wood::identify_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Identify callback: don't do anything
-// ----------------------------------------------------------------------------
-{
-    (void) arg;
-}
-
-
-void Wood::delete_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Delete callback: destroy object
-// ----------------------------------------------------------------------------
-{
-    delete (Wood *)arg;
-}
-
-
-void Wood::Draw()
-// ----------------------------------------------------------------------------
-//   Apply wood material
-// ----------------------------------------------------------------------------
-{
-    if (!tested)
+    if(!pgm && !failed)
     {
-        licensed = tao->checkImpressOrLicense("Materials 1.0");
-        tested = true;
-    }
-    if (!licensed && !tao->blink(1.0, 0.2, 300.0))
-        return;
-
-    tao->makeGLContextCurrent();
-    checkGLContext();
-
-    uint prg_id = 0;
-    if(pgm)
-        prg_id = pgm->programId();
-
-    if(prg_id)
-    {
-        // Set shader
-        tao->SetShader(prg_id);
-
-        // Set uniform values
-        glUniform1i(uniforms["noiseMap"], unit);
-
-        glUniform1f(uniforms["scale"], scale);
-        glUniform1f(uniforms["ringSize"], ring);
-        glUniform1f(uniforms["noiseRatio"], noise);
-
-        glUniform3fv(uniforms["first_color"], 1, first_color);
-        glUniform3fv(uniforms["second_color"], 1, second_color);
-
-        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
-        {
-            GLint lightsmask = tao->EnabledLights();
-            glUniform1i(uniforms["lights"], lightsmask);
-        }
-    }
-}
-
-
-void Wood::createShaders()
-// ----------------------------------------------------------------------------
-//   Create shader programs
-// ----------------------------------------------------------------------------
-{
-    if(!failed)
-    {
-        delete pgm;
-
-        pgm = new QGLShaderProgram(*pcontext);
+        pgm = new QGLShaderProgram();
         bool ok = false;
 
         // Basic vertex shader
         static string vSrc =
-                "/********************************************************************************\n"
-                "**                                                                               \n"
-                "** Copyright (C) 2011 Taodyne.                                                   \n"
-                "** All rights reserved.                                                          \n"
-                "** Contact: Taodyne (contact@taodyne.com)                                        \n"
-                "**                                                                               \n"
-                "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
-                "** It can be only used in the software and these modules.                        \n"
-                "**                                                                               \n"
-                "** If you have questions regarding the use of this file, please contact          \n"
-                "** Taodyne at contact@taodyne.com.                                               \n"
-                "**                                                                               \n"
-                "********************************************************************************/\n"
                 "varying vec3 viewDir;"
                 "varying vec3 normal;"
 
@@ -192,19 +66,6 @@ void Wood::createShaders()
             // If the extension is available, use this fragment shader
             // to handle multiple lights
             fSrc =
-               "/********************************************************************************\n"
-               "**                                                                               \n"
-               "** Copyright (C) 2011 Taodyne.                                                   \n"
-               "** All rights reserved.                                                          \n"
-               "** Contact: Taodyne (contact@taodyne.com)                                        \n"
-               "**                                                                               \n"
-               "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
-               "** It can be only used in the software and these modules.                        \n"
-               "**                                                                               \n"
-               "** If you have questions regarding the use of this file, please contact          \n"
-               "** Taodyne at contact@taodyne.com.                                               \n"
-               "**                                                                               \n"
-               "********************************************************************************/\n"
                "#extension GL_EXT_gpu_shader4 : require\n"
 
                "uniform vec3      first_color;"
@@ -324,19 +185,6 @@ void Wood::createShaders()
             // If the extension is not available, use this fragment shader
             // to handle an unique light.
             fSrc =
-               "/********************************************************************************\n"
-               "**                                                                               \n"
-               "** Copyright (C) 2011 Taodyne.                                                   \n"
-               "** All rights reserved.                                                          \n"
-               "** Contact: Taodyne (contact@taodyne.com)                                        \n"
-               "**                                                                               \n"
-               "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
-               "** It can be only used in the software and these modules.                        \n"
-               "**                                                                               \n"
-               "** If you have questions regarding the use of this file, please contact          \n"
-               "** Taodyne at contact@taodyne.com.                                               \n"
-               "**                                                                               \n"
-               "********************************************************************************/\n"
                "uniform vec3      first_color;"
                "uniform vec3      second_color;"
                "uniform sampler3D noiseMap;"
@@ -411,7 +259,7 @@ void Wood::createShaders()
             }
             else
             {
-                std::cerr << "Error loading fragment shader code : " << "\n";
+                std::cerr << "Error loading fragment shader code: " << "\n";
                 std::cerr << pgm->log().toStdString();
             }
         }
@@ -443,3 +291,102 @@ void Wood::createShaders()
         }
     }
 }
+
+
+Wood::~Wood()
+// ----------------------------------------------------------------------------
+//   Destruction
+// ----------------------------------------------------------------------------
+{
+}
+
+
+void Wood::setFirstColor(GLfloat color[3])
+// ----------------------------------------------------------------------------
+//   Set first wood color
+// ----------------------------------------------------------------------------
+{
+    first_color[0] = color[0];
+    first_color[1] = color[1];
+    first_color[2] = color[2];
+}
+
+
+void Wood::setSecondColor(GLfloat color[3])
+// ----------------------------------------------------------------------------
+//   Set second wood color
+// ----------------------------------------------------------------------------
+{
+    second_color[0] = color[0];
+    second_color[1] = color[1];
+    second_color[2] = color[2];
+}
+
+
+void Wood::render_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Rendering callback: call the render function for the object
+// ----------------------------------------------------------------------------
+{
+    ((Wood *)arg)->Draw();
+}
+
+
+void Wood::identify_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Identify callback: don't do anything
+// ----------------------------------------------------------------------------
+{
+    (void) arg;
+}
+
+
+void Wood::delete_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Delete callback: destroy object
+// ----------------------------------------------------------------------------
+{
+    delete (Wood *)arg;
+}
+
+
+void Wood::Draw()
+// ----------------------------------------------------------------------------
+//   Apply wood material
+// ----------------------------------------------------------------------------
+{
+    if (!tested)
+    {
+        licensed = tao->checkLicense("Materials 1.0", false);
+        tested = true;
+    }
+    if (!licensed && !tao->blink(1.0, 0.2))
+        return;
+
+    uint prg_id = 0;
+    if(pgm)
+        prg_id = pgm->programId();
+
+    if(prg_id)
+    {
+        // Set shader
+        tao->SetShader(prg_id);
+
+        // Set uniform values
+        glUniform1i(uniforms["noiseMap"], unit);
+
+        glUniform1f(uniforms["scale"], scale);
+        glUniform1f(uniforms["ringSize"], ring);
+        glUniform1f(uniforms["noiseRatio"], noise);
+
+        glUniform3fv(uniforms["first_color"], 1, first_color);
+        glUniform3fv(uniforms["second_color"], 1, second_color);
+
+        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
+        {
+            GLint lightsmask = tao->EnabledLights();
+            glUniform1i(uniforms["lights"], lightsmask);
+        }
+    }
+}
+

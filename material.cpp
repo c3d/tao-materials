@@ -31,11 +31,10 @@ bool Material::licensed = false;
 //
 // ============================================================================
 
-Material::Material(const QGLContext **pcontext)
+Material::Material()
 // ----------------------------------------------------------------------------
 //   Construction
 // ----------------------------------------------------------------------------
-    : pcontext(pcontext)
 {
 }
 
@@ -75,43 +74,5 @@ void Material::delete_callback(void *arg)
 
 
 void Material::Draw()
-// ----------------------------------------------------------------------------
-//   Draw material
-// ----------------------------------------------------------------------------
 {
 }
-
-
-void Material::checkGLContext()
-// ----------------------------------------------------------------------------
-//   Re-create context-dependent resources if GL context has changed
-// ----------------------------------------------------------------------------
-{
-    tao->makeGLContextCurrent();
-    if (*pcontext != QGLContext::currentContext())
-    {
-        IFTRACE(materials)
-                debug() << "Context has changed" << "\n";
-
-        *pcontext = QGLContext::currentContext();
-        createShaders();
-    }
-}
-
-
-void Material::createShaders()
-// ----------------------------------------------------------------------------
-//   Create shader programs for the material
-// ----------------------------------------------------------------------------
-{
-}
-
-std::ostream & Material::debug()
-// ----------------------------------------------------------------------------
-//   Convenience method to log with a common prefix
-// ----------------------------------------------------------------------------
-{
-    std::cerr << "[Materials] " << (void*)this << " ";
-    return std::cerr;
-}
-
