@@ -41,14 +41,12 @@ static GLfloat secondWoodColor[3] = {0.44, 0.21, 0.0};
 //   PLASTIC MATERIAL
 // -------------------------------------------------------------------------------------------------------------------
 
-Tree_p plastic(Tree_p, float r, float g, float b)
+Tree_p plastic(Tree_p)
 // ----------------------------------------------------------------------------
 //   Define plastic material
 // ----------------------------------------------------------------------------
 {
     Plastic* plastic = new Plastic();
-    plastic->setColor(r, g, b);
-
     Material::tao->AddToLayout2(Plastic::render_callback,
                                 Plastic::identify_callback,
                                 plastic, Plastic::delete_callback);

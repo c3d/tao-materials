@@ -47,12 +47,26 @@ Plastic::Plastic()
             // If the extension is available, use this vertex shader
             // to handle multiple lights
             vSrc =
+                "/********************************************************************************\n"
+                "**                                                                               \n"
+                "** Copyright (C) 2011 Taodyne.                                                   \n"
+                "** All rights reserved.                                                          \n"
+                "** Contact: Taodyne (contact@taodyne.com)                                        \n"
+                "**                                                                               \n"
+                "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
+                "** It can be only used in the software and these modules.                        \n"
+                "**                                                                               \n"
+                "** If you have questions regarding the use of this file, please contact          \n"
+                "** Taodyne at contact@taodyne.com.                                               \n"
+                "**                                                                               \n"
+                "********************************************************************************/\n"
                 "varying float ratio;"
                 "uniform vec3 camera;"
                 "uniform mat4 modelMatrix;"
 
                 "varying vec3 viewDir;"
                 "varying vec3 normal;"
+                "varying vec4 color;"
                 "void main()"
                 "{"
                 "   mat3 normalMatrix;"
@@ -83,19 +97,35 @@ Plastic::Plastic()
 
                 "   normal   =  normalize(gl_NormalMatrix * gl_Normal);"
                 "   viewDir  = -normalize((gl_ModelViewMatrix * gl_Vertex).xyz);"
+
+                "   color = gl_Color;"
                 "}";
 
             // If the extension is available, use this fragment shader
             // to handle multiple lights
             fSrc =
+                "/********************************************************************************\n"
+                "**                                                                               \n"
+                "** Copyright (C) 2011 Taodyne.                                                   \n"
+                "** All rights reserved.                                                          \n"
+                "** Contact: Taodyne (contact@taodyne.com)                                        \n"
+                "**                                                                               \n"
+                "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
+                "** It can be only used in the software and these modules.                        \n"
+                "**                                                                               \n"
+                "** If you have questions regarding the use of this file, please contact          \n"
+                "** Taodyne at contact@taodyne.com.                                               \n"
+                "**                                                                               \n"
+                "********************************************************************************/\n"
                 "#extension GL_EXT_gpu_shader4 : require\n"
 
                 "uniform int  lights;"
-                "uniform vec3 color;"
 
                 "varying float ratio;"
                 "varying vec3  viewDir;"
                 "varying vec3  normal;"
+
+                "varying vec4  color;"
 
                 "/**"
                 "* Compute render color according to materials,"
@@ -159,7 +189,7 @@ Plastic::Plastic()
 
                 "void main()"
                 "{"
-                "   vec4 renderColor = vec4(ratio, ratio, ratio, 1.0) * vec4(color, 1.0);"
+                "   vec4 renderColor = vec4(ratio, ratio, ratio, 1.0) * color;"
                 "   gl_FragColor = computeRenderColor(renderColor);"
                 "}";
         }
@@ -168,6 +198,19 @@ Plastic::Plastic()
             // If the extension is not available, use this vertex shader
             // to handle an unique light.
             vSrc =
+                "/********************************************************************************\n"
+                "**                                                                               \n"
+                "** Copyright (C) 2011 Taodyne.                                                   \n"
+                "** All rights reserved.                                                          \n"
+                "** Contact: Taodyne (contact@taodyne.com)                                        \n"
+                "**                                                                               \n"
+                "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
+                "** It can be only used in the software and these modules.                        \n"
+                "**                                                                               \n"
+                "** If you have questions regarding the use of this file, please contact          \n"
+                "** Taodyne at contact@taodyne.com.                                               \n"
+                "**                                                                               \n"
+                "********************************************************************************/\n"
                 "varying float ratio;"
 
                 "uniform vec3 camera;"
@@ -205,11 +248,24 @@ Plastic::Plastic()
             // If the extension is not available, use this fragment shader
             // to handle an unique light.
             fSrc =
+               "/********************************************************************************\n"
+               "**                                                                               \n"
+               "** Copyright (C) 2011 Taodyne.                                                   \n"
+               "** All rights reserved.                                                          \n"
+               "** Contact: Taodyne (contact@taodyne.com)                                        \n"
+               "**                                                                               \n"
+               "** This file is part of the Tao Presentations application, developped by Taodyne.\n"
+               "** It can be only used in the software and these modules.                        \n"
+               "**                                                                               \n"
+               "** If you have questions regarding the use of this file, please contact          \n"
+               "** Taodyne at contact@taodyne.com.                                               \n"
+               "**                                                                               \n"
+               "********************************************************************************/\n"
                "varying float ratio;"
-               "uniform vec3 color;"
+               "varying vec4  color;"
                "void main()"
                "{"
-               "    gl_FragColor = vec4(ratio * color, 1.0);"
+               "    gl_FragColor = vec4(ratio, 1.0) * color;"
                "}";
         }
 
@@ -243,7 +299,6 @@ Plastic::Plastic()
             // Save uniform locations
             uint id = pgm->programId();
 
-            uniforms["color"] = glGetUniformLocation(id, "color");
             uniforms["lights"] = glGetUniformLocation(id, "lights");
             uniforms["camera"] = glGetUniformLocation(id, "camera");
             uniforms["modelMatrix"] = glGetUniformLocation(id, "modelMatrix");
@@ -262,18 +317,6 @@ Plastic::~Plastic()
 // ----------------------------------------------------------------------------
 {
 }
-
-
-void Plastic::setColor(GLfloat r, GLfloat g, GLfloat b)
-// ----------------------------------------------------------------------------
-//   Set plastic color
-// ----------------------------------------------------------------------------
-{
-    color[0] = r;
-    color[1] = g;
-    color[2] = b;
-}
-
 
 void Plastic::render_callback(void *arg)
 // ----------------------------------------------------------------------------
@@ -325,7 +368,6 @@ void Plastic::Draw()
         tao->SetShader(prg_id);
 
         // Set uniform values
-        glUniform3fv(uniforms["color"], 1, color);
         glUniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
 
         // Get and set camera position
