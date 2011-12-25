@@ -29,121 +29,14 @@
 bool                  Marble::failed = false;
 QGLShaderProgram*     Marble::pgm = NULL;
 std::map<text, GLint> Marble::uniforms;
-const QGLContext*     Marble::context = NULL;
 
 Marble::Marble(uint unit, float scale)
 // ----------------------------------------------------------------------------
 //   Construction
 // ----------------------------------------------------------------------------
-    : Material(&context), unit(unit), scale(scale)
+    : unit(unit), scale(scale)
 {
-    checkGLContext();
-}
-
-
-Marble::~Marble()
-// ----------------------------------------------------------------------------
-//   Destruction
-// ----------------------------------------------------------------------------
-{
-}
-
-
-void Marble::setFirstColor(GLfloat color[3])
-// ----------------------------------------------------------------------------
-//   Set first marble color
-// ----------------------------------------------------------------------------
-{
-    first_color[0] = color[0];
-    first_color[1] = color[1];
-    first_color[2] = color[2];
-}
-
-
-void Marble::setSecondColor(GLfloat color[3])
-// ----------------------------------------------------------------------------
-//   Set second marble color
-// ----------------------------------------------------------------------------
-{
-    second_color[0] = color[0];
-    second_color[1] = color[1];
-    second_color[2] = color[2];
-}
-
-
-void Marble::render_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Rendering callback: call the render function for the object
-// ----------------------------------------------------------------------------
-{
-    ((Marble *)arg)->Draw();
-}
-
-
-void Marble::identify_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Identify callback: don't do anything
-// ----------------------------------------------------------------------------
-{
-    (void) arg;
-}
-
-
-void Marble::delete_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Delete callback: destroy object
-// ----------------------------------------------------------------------------
-{
-    delete (Marble *)arg;
-}
-
-
-void Marble::Draw()
-// ----------------------------------------------------------------------------
-//   Apply marble material
-// ----------------------------------------------------------------------------
-{
-    if (!tested)
-    {
-        licensed = tao->checkLicense("Materials 1.0", false);
-        tested = true;
-    }
-    if (!licensed && !tao->blink(1.0, 0.2))
-        return;
-
-    checkGLContext();
-
-    uint prg_id = 0;
-    if(pgm)
-        prg_id = pgm->programId();
-
-    if(prg_id)
-    {
-        // Set shader
-        tao->SetShader(prg_id);
-
-        // Set uniform values
-        glUniform1i(uniforms["noiseMap"], unit);
-
-        glUniform1f(uniforms["scale"], scale);
-        glUniform3fv(uniforms["first_color"], 1, first_color);
-        glUniform3fv(uniforms["second_color"], 1, second_color);
-
-        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
-        {
-            GLint lightsmask = tao->EnabledLights();
-            glUniform1i(uniforms["lights"], lightsmask);
-        }
-    }
-}
-
-
-void Marble::createShaders()
-// ----------------------------------------------------------------------------
-//   Create shader programs
-// ----------------------------------------------------------------------------
-{
-    if(!failed)
+    if(!pgm && !failed)
     {
         pgm = new QGLShaderProgram();
         bool ok = false;
@@ -451,3 +344,99 @@ void Marble::createShaders()
         }
     }
 }
+
+
+Marble::~Marble()
+// ----------------------------------------------------------------------------
+//   Destruction
+// ----------------------------------------------------------------------------
+{
+}
+
+
+void Marble::setFirstColor(GLfloat color[3])
+// ----------------------------------------------------------------------------
+//   Set first marble color
+// ----------------------------------------------------------------------------
+{
+    first_color[0] = color[0];
+    first_color[1] = color[1];
+    first_color[2] = color[2];
+}
+
+
+void Marble::setSecondColor(GLfloat color[3])
+// ----------------------------------------------------------------------------
+//   Set second marble color
+// ----------------------------------------------------------------------------
+{
+    second_color[0] = color[0];
+    second_color[1] = color[1];
+    second_color[2] = color[2];
+}
+
+
+void Marble::render_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Rendering callback: call the render function for the object
+// ----------------------------------------------------------------------------
+{
+    ((Marble *)arg)->Draw();
+}
+
+
+void Marble::identify_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Identify callback: don't do anything
+// ----------------------------------------------------------------------------
+{
+    (void) arg;
+}
+
+
+void Marble::delete_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Delete callback: destroy object
+// ----------------------------------------------------------------------------
+{
+    delete (Marble *)arg;
+}
+
+
+void Marble::Draw()
+// ----------------------------------------------------------------------------
+//   Apply marble material
+// ----------------------------------------------------------------------------
+{
+    if (!tested)
+    {
+        licensed = tao->checkLicense("Materials 1.0", false);
+        tested = true;
+    }
+    if (!licensed && !tao->blink(1.0, 0.2))
+        return;
+
+    uint prg_id = 0;
+    if(pgm)
+        prg_id = pgm->programId();
+
+    if(prg_id)
+    {
+        // Set shader
+        tao->SetShader(prg_id);
+
+        // Set uniform values
+        glUniform1i(uniforms["noiseMap"], unit);
+
+        glUniform1f(uniforms["scale"], scale);
+        glUniform3fv(uniforms["first_color"], 1, first_color);
+        glUniform3fv(uniforms["second_color"], 1, second_color);
+
+        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
+        {
+            GLint lightsmask = tao->EnabledLights();
+            glUniform1i(uniforms["lights"], lightsmask);
+        }
+    }
+}
+

@@ -29,105 +29,13 @@
 bool                  Plastic::failed = false;
 QGLShaderProgram*     Plastic::pgm = NULL;
 std::map<text, GLint> Plastic::uniforms;
-const QGLContext*     Plastic::context = NULL;
 
 Plastic::Plastic()
 // ----------------------------------------------------------------------------
 //   Construction
 // ----------------------------------------------------------------------------
-    : Material(&context)
 {
-    checkGLContext();
-
-    // Get model matrix
-    Matrix4 m = tao->ModelMatrix();
-    std::copy(m.Data(), m.Data() + 16, model[0]);
-}
-
-
-Plastic::~Plastic()
-// ----------------------------------------------------------------------------
-//   Destruction
-// ----------------------------------------------------------------------------
-{
-}
-
-void Plastic::render_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Rendering callback: call the render function for the object
-// ----------------------------------------------------------------------------
-{
-    ((Plastic *)arg)->Draw();
-}
-
-
-void Plastic::identify_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Identify callback: don't do anything
-// ----------------------------------------------------------------------------
-{
-    (void) arg;
-}
-
-
-void Plastic::delete_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Delete callback: destroy object
-// ----------------------------------------------------------------------------
-{
-    delete (Plastic *)arg;
-}
-
-
-void Plastic::Draw()
-// ----------------------------------------------------------------------------
-//   Apply plastic material
-// ----------------------------------------------------------------------------
-{
-    if (!tested)
-    {
-        licensed = tao->checkLicense("Materials 1.0", false);
-        tested = true;
-    }
-    if (!licensed && !tao->blink(1.0, 0.2))
-        return;
-
-    checkGLContext();
-
-    uint prg_id = 0;
-    if(pgm)
-        prg_id = pgm->programId();
-
-    if(prg_id)
-    {
-        // Set shader
-        tao->SetShader(prg_id);
-
-        // Set uniform values
-        glUniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
-
-        // Get and set camera position
-        Vector3 cam;
-        tao->getCamera(&cam, NULL, NULL);
-        GLfloat camera[3] = {cam.x, cam.y, cam.z};
-        glUniform3fv(uniforms["camera"], 1, camera);
-
-
-        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
-        {
-            GLint lightsmask = tao->EnabledLights();
-            glUniform1i(uniforms["lights"], lightsmask);
-        }
-    }
-}
-
-
-void Plastic::createShaders()
-// ----------------------------------------------------------------------------
-//   Create shader programs
-// ----------------------------------------------------------------------------
-{
-    if(!failed)
+    if(!pgm && !failed)
     {
         pgm = new QGLShaderProgram();
         bool ok = false;
@@ -135,7 +43,7 @@ void Plastic::createShaders()
         static string vSrc;
         static string fSrc;
         if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
-        {
+        {            
             // If the extension is available, use this vertex shader
             // to handle multiple lights
             vSrc =
@@ -396,4 +304,84 @@ void Plastic::createShaders()
             uniforms["modelMatrix"] = glGetUniformLocation(id, "modelMatrix");
         }
     }
+
+    // Get model matrix
+    Matrix4 m = tao->ModelMatrix();
+    std::copy(m.Data(), m.Data() + 16, model[0]);
 }
+
+
+Plastic::~Plastic()
+// ----------------------------------------------------------------------------
+//   Destruction
+// ----------------------------------------------------------------------------
+{
+}
+
+void Plastic::render_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Rendering callback: call the render function for the object
+// ----------------------------------------------------------------------------
+{
+    ((Plastic *)arg)->Draw();
+}
+
+
+void Plastic::identify_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Identify callback: don't do anything
+// ----------------------------------------------------------------------------
+{
+    (void) arg;
+}
+
+
+void Plastic::delete_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Delete callback: destroy object
+// ----------------------------------------------------------------------------
+{
+    delete (Plastic *)arg;
+}
+
+
+void Plastic::Draw()
+// ----------------------------------------------------------------------------
+//   Apply plastic material
+// ----------------------------------------------------------------------------
+{
+    if (!tested)
+    {
+        licensed = tao->checkLicense("Materials 1.0", false);
+        tested = true;
+    }
+    if (!licensed && !tao->blink(1.0, 0.2))
+        return;
+
+    uint prg_id = 0;
+    if(pgm)
+        prg_id = pgm->programId();
+
+    if(prg_id)
+    {
+        // Set shader
+        tao->SetShader(prg_id);
+
+        // Set uniform values
+        glUniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
+
+        // Get and set camera position
+        Vector3 cam;
+        tao->getCamera(&cam, NULL, NULL);
+        GLfloat camera[3] = {cam.x, cam.y, cam.z};
+        glUniform3fv(uniforms["camera"], 1, camera);
+
+
+        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
+        {
+            GLint lightsmask = tao->EnabledLights();
+            glUniform1i(uniforms["lights"], lightsmask);
+        }
+    }
+}
+

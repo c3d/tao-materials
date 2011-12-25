@@ -29,21 +29,15 @@ using namespace Tao;
 
 struct Material : public QObject
 {
-    Material(const QGLContext **pcontext);
+    Material();
     ~Material();
 
     // Draw material
     virtual void    Draw();
-    // Re-create shaders if GL context has changed
-    void            checkGLContext();
-    virtual void    createShaders();
 
     static void     render_callback(void *arg);
     static void     identify_callback(void *arg);
     static void     delete_callback(void *arg);
-
-public:
-    const QGLContext    **pcontext;
 
 public:
     static bool tested, licensed;
