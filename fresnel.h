@@ -42,6 +42,9 @@ struct Fresnel : public Material
     static void     identify_callback(void *arg);
     static void     delete_callback(void *arg);
 
+protected:
+    virtual void    createShaders();
+
 private:
     uint    unit;        // Unit of the noise map
     float   IoR;         // Indice of refraction
@@ -52,6 +55,7 @@ private:
     static bool failed;
     static QGLShaderProgram* pgm;
     static std::map<text, GLint> uniforms;
+    static const QGLContext* context;
 };
 
 
