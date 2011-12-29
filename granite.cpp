@@ -29,14 +29,133 @@
 bool                  Granite::failed = false;
 QGLShaderProgram*     Granite::pgm = NULL;
 std::map<text, GLint> Granite::uniforms;
+const QGLContext*     Granite::context = NULL;
 
 Granite::Granite(uint unit, float scale)
 // ----------------------------------------------------------------------------
 //   Construction
 // ----------------------------------------------------------------------------
-    : unit(unit), scale(scale)
+    : Material(&context), unit(unit), scale(scale)
 {
-    if(!pgm && !failed)
+    checkGLContext();
+}
+
+
+Granite::~Granite()
+// ----------------------------------------------------------------------------
+//   Destruction
+// ----------------------------------------------------------------------------
+{
+}
+
+
+void Granite::setFirstColor(GLfloat color[3])
+// ----------------------------------------------------------------------------
+//   Set first granite color
+// ----------------------------------------------------------------------------
+{
+    first_color[0] = color[0];
+    first_color[1] = color[1];
+    first_color[2] = color[2];
+}
+
+
+void Granite::setSecondColor(GLfloat color[3])
+// ----------------------------------------------------------------------------
+//   Set second granite color
+// ----------------------------------------------------------------------------
+{
+    second_color[0] = color[0];
+    second_color[1] = color[1];
+    second_color[2] = color[2];
+}
+
+
+void Granite::setThirdColor(GLfloat color[3])
+// ----------------------------------------------------------------------------
+//   Set third granite color
+// ----------------------------------------------------------------------------
+{
+    third_color[0] = color[0];
+    third_color[1] = color[1];
+    third_color[2] = color[2];
+}
+
+
+void Granite::render_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Rendering callback: call the render function for the object
+// ----------------------------------------------------------------------------
+{
+    ((Granite *)arg)->Draw();
+}
+
+
+void Granite::identify_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Identify callback: don't do anything
+// ----------------------------------------------------------------------------
+{
+    (void) arg;
+}
+
+
+void Granite::delete_callback(void *arg)
+// ----------------------------------------------------------------------------
+//   Delete callback: destroy object
+// ----------------------------------------------------------------------------
+{
+    delete (Granite *)arg;
+}
+
+
+void Granite::Draw()
+// ----------------------------------------------------------------------------
+//   Apply granite material
+// ----------------------------------------------------------------------------
+{
+    if (!tested)
+    {
+        licensed = tao->checkLicense("Materials 1.0", false);
+        tested = true;
+    }
+    if (!licensed && !tao->blink(1.0, 0.2))
+        return;
+
+    checkGLContext();
+
+    uint prg_id = 0;
+    if(pgm)
+        prg_id = pgm->programId();
+
+    if(prg_id)
+    {
+        // Set shader
+        tao->SetShader(prg_id);
+
+        // Set uniform values
+        glUniform1i(uniforms["noiseMap"], unit);
+
+        glUniform1f(uniforms["scale"], scale);
+        glUniform3fv(uniforms["first_color"], 1, first_color);
+        glUniform3fv(uniforms["second_color"], 1, second_color);
+        glUniform3fv(uniforms["third_color"], 1, third_color);
+
+        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
+        {
+            GLint lightsmask = tao->EnabledLights();
+            glUniform1i(uniforms["lights"], lightsmask);
+        }
+    }
+}
+
+
+void Granite::createShaders()
+// ----------------------------------------------------------------------------
+//   Create shader programs
+// ----------------------------------------------------------------------------
+{
+    if(!failed)
     {
         pgm = new QGLShaderProgram();
         bool ok = false;
@@ -351,111 +470,3 @@ Granite::Granite(uint unit, float scale)
         }
     }
 }
-
-
-Granite::~Granite()
-// ----------------------------------------------------------------------------
-//   Destruction
-// ----------------------------------------------------------------------------
-{
-}
-
-
-void Granite::setFirstColor(GLfloat color[3])
-// ----------------------------------------------------------------------------
-//   Set first granite color
-// ----------------------------------------------------------------------------
-{
-    first_color[0] = color[0];
-    first_color[1] = color[1];
-    first_color[2] = color[2];
-}
-
-
-void Granite::setSecondColor(GLfloat color[3])
-// ----------------------------------------------------------------------------
-//   Set second granite color
-// ----------------------------------------------------------------------------
-{
-    second_color[0] = color[0];
-    second_color[1] = color[1];
-    second_color[2] = color[2];
-}
-
-
-void Granite::setThirdColor(GLfloat color[3])
-// ----------------------------------------------------------------------------
-//   Set third granite color
-// ----------------------------------------------------------------------------
-{
-    third_color[0] = color[0];
-    third_color[1] = color[1];
-    third_color[2] = color[2];
-}
-
-
-void Granite::render_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Rendering callback: call the render function for the object
-// ----------------------------------------------------------------------------
-{
-    ((Granite *)arg)->Draw();
-}
-
-
-void Granite::identify_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Identify callback: don't do anything
-// ----------------------------------------------------------------------------
-{
-    (void) arg;
-}
-
-
-void Granite::delete_callback(void *arg)
-// ----------------------------------------------------------------------------
-//   Delete callback: destroy object
-// ----------------------------------------------------------------------------
-{
-    delete (Granite *)arg;
-}
-
-
-void Granite::Draw()
-// ----------------------------------------------------------------------------
-//   Apply granite material
-// ----------------------------------------------------------------------------
-{
-    if (!tested)
-    {
-        licensed = tao->checkLicense("Materials 1.0", false);
-        tested = true;
-    }
-    if (!licensed && !tao->blink(1.0, 0.2))
-        return;
-
-    uint prg_id = 0;
-    if(pgm)
-        prg_id = pgm->programId();
-
-    if(prg_id)
-    {
-        // Set shader
-        tao->SetShader(prg_id);
-
-        // Set uniform values
-        glUniform1i(uniforms["noiseMap"], unit);
-
-        glUniform1f(uniforms["scale"], scale);
-        glUniform3fv(uniforms["first_color"], 1, first_color);
-        glUniform3fv(uniforms["second_color"], 1, second_color);
-        glUniform3fv(uniforms["third_color"], 1, third_color);
-
-        if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
-        {
-            GLint lightsmask = tao->EnabledLights();
-            glUniform1i(uniforms["lights"], lightsmask);
-        }
-    }
-}
-

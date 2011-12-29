@@ -31,10 +31,11 @@ bool Material::licensed = false;
 //
 // ============================================================================
 
-Material::Material()
+Material::Material(const QGLContext **pcontext)
 // ----------------------------------------------------------------------------
 //   Construction
 // ----------------------------------------------------------------------------
+    : pcontext(pcontext)
 {
 }
 
@@ -74,5 +75,26 @@ void Material::delete_callback(void *arg)
 
 
 void Material::Draw()
+{
+}
+
+
+void Material::checkGLContext()
+// ----------------------------------------------------------------------------
+//   Re-create context-dependent resources if GL context has changed
+// ----------------------------------------------------------------------------
+{
+    if (*pcontext != QGLContext::currentContext())
+    {
+        createShaders();
+        *pcontext = QGLContext::currentContext();
+    }
+}
+
+
+void Material::createShaders()
+// ----------------------------------------------------------------------------
+//   Create shader programs for the material
+// ----------------------------------------------------------------------------
 {
 }

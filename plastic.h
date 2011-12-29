@@ -42,12 +42,16 @@ struct Plastic : public Material
     static void     identify_callback(void *arg);
     static void     delete_callback(void *arg);
 
+protected:
+    virtual void    createShaders();
+
 private:
     GLfloat model[4][4]; // model matrix
 
     static bool failed;
     static QGLShaderProgram* pgm;
     static std::map<text, GLint> uniforms;
+    static const QGLContext* context;
 };
 
 
