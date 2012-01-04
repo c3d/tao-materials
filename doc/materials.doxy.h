@@ -1,6 +1,5 @@
 /**
- * @defgroup Materials Materials
- * @ingroup Modules
+ * @taomoduledescription{Materials, Materials}
  *
  * Define some useful materials.
  *
@@ -13,19 +12,20 @@
  * @note For more complex scene, it is recommended to define directly your own materials
  * by using combinaisons of available functions in this module and in Tao.
  *
+ * @endtaomoduledescription{Materials}
  * @{
  */
 
 /**
  * Defines a sort of plastic material.
  *
- * Set a sort of plastic material, whose color is defined by (@p r, @p g, @p b).
+ * Set a sort of plastic material, whose color is defined by @ref graph.doxy.h::color(r:real,g:real,b:real,a:real).
  *
  * @note This material act as a simple texture.
  * @note There is no one reflection on this material.
  *
  */
-plastic(r:real, g:real, b:real);
+plastic();
 
 /**
  * Defines the first color of the marble material.
