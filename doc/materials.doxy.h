@@ -1,6 +1,5 @@
 /**
- * @defgroup Materials Materials
- * @ingroup Modules
+ * @taomoduledescription{Materials, Materials}
  *
  * Define some useful materials.
  *
@@ -13,6 +12,7 @@
  * @note For more complex scene, it is recommended to define directly your own materials
  * by using combinaisons of available functions in this module and in Tao.
  *
+ * @endtaomoduledescription{Materials}
  * @{
  */
 
