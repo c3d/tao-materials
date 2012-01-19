@@ -108,7 +108,7 @@ void Marble::Draw()
         licensed = tao->checkLicense("Materials 1.0", false);
         tested = true;
     }
-    if (!licensed && !tao->blink(1.0, 0.2))
+    if (!licensed && !tao->blink(1.0, 0.2, 300.0))
         return;
 
     checkGLContext();
