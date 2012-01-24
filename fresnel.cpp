@@ -91,7 +91,7 @@ void Fresnel::Draw()
         licensed = tao->checkLicense("Materials 1.0", false);
         tested = true;
     }
-    if (!licensed && !tao->blink(1.0, 0.2))
+    if (!licensed && !tao->blink(1.0, 0.2, 300.0))
         return;
 
     checkGLContext();
@@ -117,7 +117,7 @@ void Fresnel::Draw()
 
         // Get and set camera position
         Vector3 cam;
-        tao->getCamera(&cam, NULL, NULL);
+        tao->getCamera(&cam, NULL, NULL, NULL);
         GLfloat camera[3] = {cam.x, cam.y, cam.z};
         glUniform3fv(uniforms["camera"], 1, camera);
 
