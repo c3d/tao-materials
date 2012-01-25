@@ -19,7 +19,7 @@
  *
  * Définit des matériaux usuels.
  *
- * Ce module permet d'applique des matériaux à des objets 3D (plastique, marbre,
+ * Ce module permet d'appliquer des matériaux à des objets 3D (plastique, marbre,
  * granit...).
  *
  * @image html materials.png "Exemple de matériaux"
@@ -83,7 +83,7 @@ marble_second_color(r:real, g:real, b:real);
  *
  * @note This material is a procedural texture.
  *
- * @~english
+ * @~french
  * Active un matériau qui ressemble à du marbre.
  *
  * Les couleurs des marbrures peuvent être modifiées grâce à
@@ -321,7 +321,7 @@ sphere 0, 0, 0, 500, 500, 500, 50, 50
  *
  * Exemple :
 @code
-// La cube map permet de simuler des réflections
+// La cube map permet de simuler des réflexions
 cube_map 512,
    cube_map_face 0, "right.png"
    cube_map_face 1, "left.png"
