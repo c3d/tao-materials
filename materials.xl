@@ -14,545 +14,77 @@ module_description
     version "1.0"
 
 module_description "fr",
-    name "Filtrage"
+    name "Matériaux"
     description "Permet d'appliquer différents matériaux sur des objets présent dans une scène."
 
-SHADER4_AVAILABLE_MATERIALS -> true
-SHADER4_AVAILABLE_MATERIALS := is_ext_available "GL_EXT_gpu_shader4"
+import Mapping 1.0
 
 // -------------------------------------------------------------------------------------------------------------------
-//   PLASTIC MATERIAL
+//   MARBLE MATERIAL
 // -------------------------------------------------------------------------------------------------------------------
 
-// Plastic color
-PLASTIC_R -> 1.0
-PLASTIC_R := 1.0
-PLASTIC_G -> 1.0
-PLASTIC_G := 1.0
-PLASTIC_B -> 1.0
-PLASTIC_B := 1.0
-
-plastic r:real, g:real, b:real ->
+marble scale:real ->
     /**
-    * Apply plastic material.
+    * Apply marble material.
     **/
-    PLASTIC_R := r
-    PLASTIC_G := g
-    PLASTIC_B := b
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        plastic_shader_lights
-    else
-        plastic_shader_no_lights
+    marble scale, 128
 
-plastic_shader_lights ->
+marble scale:real, seed:integer ->
     /**
-    * Define plastic shader with a full support of lights.
+    * Apply marble material.
     **/
-    shader_program
-        vertex_shader <<
-            #extension GL_EXT_gpu_shader4 : require
-            #extension GL_EXT_gpu_shader4 : enable
+    // Default noise map 3D
+    noise_map_3D 128, 128, seed
 
-            varying float ratio;
-            uniform vec3 camera;
+    marble_material texture_unit, scale
 
-            uniform int lights;
+// -------------------------------------------------------------------------------------------------------------------
+//   GRANITE MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
 
-            varying vec3 lightDir[8];
-            varying vec3 viewDir;
-            varying vec3 normal;
-            void main()
-            {
-               gl_Position = ftransform();
-
-               // World-space lighting
-               normal   =  normalize(gl_NormalMatrix * gl_Normal);
-               viewDir  = -normalize((gl_ModelViewMatrix * gl_Vertex).xyz);
-
-               vec3 eyePos   = normalize(camera + viewDir);
-               ratio = 0.5 * (1.0 + dot(eyePos, normal));
-
-               // Compute light direction
-               if(lights > 0)
-                   for(int i = 0; i < lights; i++)
-                       if(bool(lights & (1 << i)))
-                           lightDir[i] = gl_LightSource[i].position.xyz;
-            }
-        >>
-        fragment_shader <<
-            #extension GL_EXT_gpu_shader4 : require
-            #extension GL_EXT_gpu_shader4 : enable
-
-            varying float ratio;
-            uniform vec3 color;
-
-            uniform int lights;
-
-            varying vec3 lightDir[8];
-            varying vec3 viewDir;
-            varying vec3 normal;
-            /**
-            * Compute render color according to materials, lights and colors parameters
-            * which are set in the current scene.
-            **/
-            vec4 computeRenderColor(vec4 renderColor)
-            {
-                vec4 lighting_color;
-                if(lights > 0)
-                {
-                    vec3 N = normalize(normal);
-                    vec3 V = normalize(viewDir);
-
-                    vec4 ambient  = vec4(0.0);
-                    vec4 diffuse  = vec4(0.0);
-                    vec4 specular = vec4(0.0);
-                    ambient  = gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient;
-
-                    for(int i = 0; i < lights; i++)
-                    {
-                        if(bool(lights & (1 << i)))
-                        {
-                            vec3 L = normalize(lightDir[i]);
-
-                            // Compute ambient part
-                            ambient += gl_LightSource[i].ambient * gl_FrontMaterial.ambient;
-
-                            // Diffuse coefficient
-                            float nDotL = max(clamp(dot(L, N), 0.0, 1.0), 0.0);
-                            if (nDotL > 0.0)
-                            {
-                                // Compute diffuse part
-                                diffuse += gl_LightSource[i].diffuse * gl_FrontMaterial.diffuse * nDotL;
-
-                                // Compute specular coefficient
-                                float nDotV = clamp(dot(reflect(-L, N), V), 0.0, 1.0);
-                                if (nDotV > 0.0)
-                                {
-                                    // Compute specular part
-                                    specular += gl_LightSource[i].specular * gl_FrontMaterial.specular * pow(nDotV, gl_FrontMaterial.shininess);
-                                }
-                            }
-                        }
-                    }
-
-                     // Define new render color
-                    lighting_color  = (ambient + diffuse) * vec4(color, 1.0) * renderColor + specular;
-                }
-                else
-                {
-                    // Define new render color
-                    lighting_color = renderColor * vec4(color, 1.0);
-                }
-
-                return lighting_color;
-            }
-
-            void main()
-            {
-                vec4 renderColor = vec4(ratio, ratio, ratio, 1.0);
-                gl_FragColor = computeRenderColor(renderColor);
-            }
-        >>
-    shader_set lights := light_id
-    shader_set color  := (PLASTIC_R; PLASTIC_G; PLASTIC_B)
-    //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
-    shader_set camera := (camera_position at 1; camera_position at 2; camera_position at 3)
-
-plastic_shader_no_lights ->
+granite scale:real ->
     /**
-    * Define plastic shader with no lights supported.
+    * Apply default granite material.
     **/
-    shader_program
-        vertex_shader <<
-            varying float ratio;
-            uniform vec3 camera;
-            void main()
-            {
-               gl_Position = ftransform();
+    granite scale, 128
 
-               // World-space lighting
-               vec3 worldPos = vec3(gl_ModelViewMatrix * gl_Vertex);
-               vec3 normal   = normalize (gl_NormalMatrix * gl_Normal);
-               vec3 eyePos   = normalize(camera - worldPos);
+granite scale:real, seed:integer ->
+    /**
+    * Apply granite material.
+    **/
+    // Default noise map 3D
+    noise_map_3D 128, 128, seed
 
-               ratio = 0.5 * (1.0 + dot(eyePos, normal));
-            }
-        >>
-        fragment_shader <<
-            varying float ratio;
-            uniform vec3 color;
-            void main()
-            {
-                gl_FragColor = vec4(ratio * color, 1.0);
-            }
-        >>
-    shader_set color  := (PLASTIC_R; PLASTIC_G; PLASTIC_B)
-    //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
-    shader_set camera := (camera_position at 1; camera_position at 2; camera_position at 3)
+    granite_material texture_unit, scale
+
+// -------------------------------------------------------------------------------------------------------------------
+//   WOOD MATERIAL
+// -------------------------------------------------------------------------------------------------------------------
+
+wood scale:real ->
+    /**
+    * Apply wood material.
+    **/
+    wood scale, 20.0, 0.87, 128
+
+wood scale:real, ring:real, noise:real, seed:integer ->
+    /**
+    * Apply wood material.
+    **/
+    // Default noise map 3D
+    noise_map_3D 128, 128, seed
+
+    wood_material texture_unit, scale, ring, noise
 
 // -------------------------------------------------------------------------------------------------------------------
 //   FRESNEL MATERIAL
 // -------------------------------------------------------------------------------------------------------------------
 
-// Material roughness
-FRESNEL_ROUGHNESS -> 1.0
-FRESNEL_ROUGHNESS := 1.0
-
-// Indice of refraction
-FRESNEL_REFRACTION -> 1.0
-FRESNEL_REFRACTION := 1.0
-
-// Material ratio bending
-FRESNEL_RATIO -> 0.0
-FRESNEL_RATIO := 1.0
-
-
 fresnel_material r:real, n:real, roughness:real ->
     /**
-    * Apply a fresnel material.
+    * Apply a fresnel material with the current cube map.
     **/
-    FRESNEL_RATIO := r
-    FRESNEL_REFRACTION := n
-    FRESNEL_ROUGHNESS  := roughness
-    if SHADER4_AVAILABLE_MATERIALS = true then
-        fresnel_shader_lights
-    else
-        fresnel_shader_no_lights
-
-fresnel_shader_lights ->
-    /**
-    * Define shader for fresnel material with full support of lights.
-    **/
-    shader_program
-        shader_log
-        vertex_shader <<
-            #extension GL_EXT_gpu_shader4 : require
-            #extension GL_EXT_gpu_shader4 : enable
-
-            uniform vec3 camera;
-            uniform mat4 modelMatrix;
-
-            uniform int lights;
-
-            varying vec3 normalWorld;
-            varying vec3 viewWorld;
-
-            varying vec3 lightDir[8];
-            varying vec3 normal;
-            varying vec3 viewDir;
-            void main()
-            {
-               mat3 normalMatrix;
-
-               // First column
-               normalMatrix[0][0] = modelMatrix[0][0];
-               normalMatrix[0][1] = modelMatrix[0][1];
-               normalMatrix[0][2] = modelMatrix[0][2];
-
-               // Second column
-               normalMatrix[1][0] = modelMatrix[1][0];
-               normalMatrix[1][1] = modelMatrix[1][1];
-               normalMatrix[1][2] = modelMatrix[1][2];
-
-               // Third column
-               normalMatrix[2][0] = modelMatrix[2][0];
-               normalMatrix[2][1] = modelMatrix[2][1];
-               normalMatrix[2][2] = modelMatrix[2][2];
-
-               gl_Position = ftransform();
-
-               // World-space
-               vec3 eyePos   = vec3(gl_TextureMatrix[0] * modelMatrix * gl_Vertex);
-               normalWorld   = normalize(normalMatrix * gl_Normal);
-               viewWorld     = normalize(eyePos - camera);
-
-               // Eye-space
-               eyePos  = (gl_ModelViewMatrix * gl_Vertex).xyz;
-               normal  = normalize(gl_NormalMatrix * gl_Normal);
-               viewDir = normalize(-eyePos);
-
-               // Compute light direction
-               if(lights > 0)
-                   for(int i = 0; i < lights; i++)
-                       if(bool(lights & (1 << i)))
-                           lightDir[i] = gl_LightSource[i].position.xyz;
-            }
-        >>
-        fragment_shader <<
-            #extension GL_EXT_gpu_shader4 : require
-            #extension GL_EXT_gpu_shader4 : enable
-
-            // Material parameters
-            uniform float Eta; // Ratio of indices of refraction
-            uniform float ratio;
-            uniform float roughness;
-            uniform samplerCube environmentMap;
-
-            uniform int lights;
-
-            varying vec3 normalWorld;
-            varying vec3 viewWorld;
-
-            varying vec3 lightDir[8];
-            varying vec3 normal;
-            varying vec3 viewDir;
-
-            const float roughness_ratio = 50.0;
-
-            /**
-            * Compute render color according to materials, lights and colors parameters
-            * which are set in the current scene.
-            **/
-            vec4 computeRenderColor()
-            {
-                vec4 lighting_color;
-                vec3 N = normalize(normal);
-                vec3 V = normalize(viewDir);
-
-                vec4 ambient  = vec4(0.0);
-                vec4 diffuse  = vec4(0.0);
-                vec4 specular = vec4(0.0);
-
-                if(lights > 0)
-                {
-                    ambient  = gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient;
-
-                    for(int i = 0; i < lights; i++)
-                    {
-                        if(bool(lights & (1 << i)))
-                        {
-                            vec3 L = normalize(lightDir[i]);
-
-                            // Compute ambient part
-                            ambient += gl_LightSource[i].ambient * gl_FrontMaterial.ambient;
-
-                            // Diffuse coefficient
-                            float nDotL = max(clamp(dot(L, N), 0.0, 1.0), 0.0);
-                            if (nDotL > 0.0)
-                            {
-                                // Compute diffuse part
-                                diffuse += gl_LightSource[i].diffuse * gl_FrontMaterial.diffuse * nDotL;
-
-                                // Compute specular coefficient
-                                float nDotV = clamp(dot(reflect(-L, N), V), 0.0, 1.0);
-                                if (nDotV > 0.0)
-                                {
-                                    // Compute specular part
-                                    specular += gl_LightSource[i].specular * gl_FrontMaterial.specular * pow(nDotV, gl_FrontMaterial.shininess);
-                                }
-                            }
-                        }
-                    }
-
-                     // Define new render color
-                    lighting_color  = ambient + diffuse + specular;
-                }
-                else
-                {
-                    // We define a default light position in case there are no one defined.
-                    vec3 L = normalize(vec3(0, 0, 50));
-
-                    // Compute ambient part
-                    ambient = gl_FrontMaterial.ambient;
-
-                    // Diffuse coefficient
-                    float nDotL = max(clamp(dot(L, N), 0.0, 1.0), 0.0);
-                    if (nDotL > 0.0)
-                    {
-                        // Compute diffuse part
-                        diffuse = gl_FrontMaterial.diffuse * nDotL;
-
-                        // Compute specular coefficient
-                        float nDotV = clamp(dot(reflect(-L, N), V), 0.0, 1.0);
-                        if (nDotV > 0.0)
-                        {
-                            // Compute specular part
-                            specular = gl_FrontMaterial.specular * pow(nDotV, gl_FrontMaterial.shininess);
-                        }
-                    }
-
-                     // Define new render color
-                    lighting_color  = ambient + diffuse + specular;
-                }
-
-                return lighting_color;
-            }
-
-
-            void main()
-            {
-                vec3 reflectDir, refractDir;
-                reflectDir = normalize(reflect(viewWorld, normalWorld));
-                refractDir = normalize(refract(viewWorld, normalWorld, Eta));
-
-                vec3 reflectColor, refractColor;
-                reflectColor = textureCube(environmentMap, reflectDir).xyz;
-                refractColor = textureCube(environmentMap, refractDir).xyz;
-
-                // Compute fresnel ratio
-                float fresnel = pow(1.0 - (dot(-viewWorld, normalWorld)), 1.0 / (roughness * roughness_ratio));
-
-                // Compute final color
-                vec3 fresnelColor  = mix(refractColor, reflectColor, fresnel);
-                vec3 renderColor   = computeRenderColor().rgb;
-                vec3 finalColor    = mix(fresnelColor, renderColor, ratio);
-
-
-                gl_FragColor  = vec4(finalColor, 1.0);
-            }
-        >>
-
-    shader_set Eta            := FRESNEL_REFRACTION
-    shader_set ratio          := FRESNEL_RATIO
-    shader_set roughness      := FRESNEL_ROUGHNESS
-    shader_set environmentMap := texture_unit
-    shader_set lights         := light_id
-
-    //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
-    shader_set camera         := (camera_position at 1; camera_position at 2; camera_position at 3)
-    shader_set modelMatrix    := (model_matrix at 1;  model_matrix at 2;  model_matrix at 3;  model_matrix at 4;
-                                  model_matrix at 5;  model_matrix at 6;  model_matrix at 7;  model_matrix at 8;
-                                  model_matrix at 9;  model_matrix at 10; model_matrix at 11; model_matrix at 12;
-                                  model_matrix at 13; model_matrix at 14; model_matrix at 15; model_matrix at 16)
-
-fresnel_shader_no_lights ->
-    /**
-    * Define shader for fresnel material with no support of lights.
-    **/
-    shader_program
-        shader_log
-        vertex_shader <<
-            uniform vec3 camera;
-            uniform mat4 modelMatrix;
-
-            varying vec3 normalWorld;
-            varying vec3 viewWorld;
-
-            varying vec3 normal;
-            varying vec3 viewDir;
-            void main()
-            {
-               mat3 normalMatrix;
-
-               // First column
-               normalMatrix[0][0] = modelMatrix[0][0];
-               normalMatrix[0][1] = modelMatrix[0][1];
-               normalMatrix[0][2] = modelMatrix[0][2];
-
-               // Second column
-               normalMatrix[1][0] = modelMatrix[1][0];
-               normalMatrix[1][1] = modelMatrix[1][1];
-               normalMatrix[1][2] = modelMatrix[1][2];
-
-               // Third column
-               normalMatrix[2][0] = modelMatrix[2][0];
-               normalMatrix[2][1] = modelMatrix[2][1];
-               normalMatrix[2][2] = modelMatrix[2][2];
-
-               gl_Position = ftransform();
-
-               // World-space
-               vec3 eyePos   = vec3(gl_TextureMatrix[0] * modelMatrix * gl_Vertex);
-               normalWorld   = normalize(normalMatrix * gl_Normal);
-               viewWorld     = normalize(eyePos - camera);
-
-               // Eye-space
-               eyePos  = (gl_ModelViewMatrix * gl_Vertex).xyz;
-               normal  = normalize(gl_NormalMatrix * gl_Normal);
-               viewDir = normalize(-eyePos);
-            }
-        >>
-        fragment_shader <<
-
-            // Material parameters
-            uniform float Eta; // Ratio of indices of refraction
-            uniform float ratio;
-            uniform float roughness;
-            uniform samplerCube environmentMap;
-
-            varying vec3 normalWorld;
-            varying vec3 viewWorld;
-
-            varying vec3 normal;
-            varying vec3 viewDir;
-
-            const float roughness_ratio = 50.0;
-
-            /**
-            * Compute render color according to materials, lights and colors parameters
-            * which are set in the current scene.
-            **/
-            vec4 computeRenderColor()
-            {
-                vec4 lighting_color;
-                vec3 N = normalize(normal);
-                vec3 V = normalize(viewDir);
-
-                vec4 ambient  = vec4(0.0);
-                vec4 diffuse  = vec4(0.0);
-                vec4 specular = vec4(0.0);
-
-                // We define a default light position in case there are no one defined.
-                vec3 L = normalize(vec3(0, 0, 50));
-
-                // Compute ambient part
-                ambient = gl_FrontMaterial.ambient;
-
-                // Diffuse coefficient
-                float nDotL = max(clamp(dot(L, N), 0.0, 1.0), 0.0);
-                if (nDotL > 0.0)
-                {
-                    // Compute diffuse part
-                    diffuse = gl_FrontMaterial.diffuse * nDotL;
-
-                    // Compute specular coefficient
-                    float nDotV = clamp(dot(reflect(-L, N), V), 0.0, 1.0);
-                    if (nDotV > 0.0)
-                    {
-                        // Compute specular part
-                        specular = gl_FrontMaterial.specular * pow(nDotV, gl_FrontMaterial.shininess);
-                    }
-                }
-
-                lighting_color = ambient + diffuse + specular;
-
-                return lighting_color;
-            }
-
-            void main()
-            {
-                vec3 reflectDir, refractDir;
-                reflectDir = normalize(reflect(viewWorld, normalWorld));
-                refractDir = normalize(refract(viewWorld, normalWorld, Eta));
-
-                vec3 reflectColor, refractColor;
-                reflectColor = textureCube(environmentMap, reflectDir).xyz;
-                refractColor = textureCube(environmentMap, refractDir).xyz;
-
-                // Compute fresnel ratio
-                float fresnel = pow(1.0 - (dot(-viewWorld, normalWorld)), 1.0 / (roughness * roughness_ratio));
-
-                // Compute final color
-                vec3 fresnelColor  = mix(refractColor, reflectColor, fresnel);
-                vec3 renderColor   = computeRenderColor().rgb;
-                vec3 finalColor    = mix(fresnelColor, renderColor, ratio);
-
-                 // Define new render color
-                gl_FragColor  = vec4(finalColor, 1.0);
-            }
-        >>
-
-    shader_set Eta            := FRESNEL_REFRACTION
-    shader_set ratio          := FRESNEL_RATIO
-    shader_set roughness      := FRESNEL_ROUGHNESS
-    shader_set environmentMap := texture_unit
-
-    //FOLLOWING PARAMETERS ARE NEEDED BUT NOT OPTIMIZED BECAUSE LISTS ARE RELOAD FULLY TO EACH XL FUNCTIONS CALL
-    shader_set camera         := (camera_position at 1; camera_position at 2; camera_position at 3)
-    shader_set modelMatrix    := (model_matrix at 1;  model_matrix at 2;  model_matrix at 3;  model_matrix at 4;
-                                  model_matrix at 5;  model_matrix at 6;  model_matrix at 7;  model_matrix at 8;
-                                  model_matrix at 9;  model_matrix at 10; model_matrix at 11; model_matrix at 12;
-                                  model_matrix at 13; model_matrix at 14; model_matrix at 15; model_matrix at 16)
+    fresnel_material texture_unit, r, n, roughness
 
 // -------------------------------------------------------------------------------------------------------------------
 //   GLASS MATERIAL
@@ -594,7 +126,7 @@ silver ->
     material_diffuse 0.50754, 0.50754, 0.50754, 1.0
     material_specular 0.508273, 0.508273, 0.508273, 1.0
     material_shininess 51.2
-    fresnel_material 0.4, 0.8, 10.0
+    fresnel_material 0.7, 0.8, 10.0
 
 // -------------------------------------------------------------------------------------------------------------------
 //   GOLD MATERIAL
@@ -636,7 +168,7 @@ chrome  ->
     material_diffuse 0.4, 0.4, 0.4, 1.0
     material_specular 0.774597, 0.774597, 0.774597, 1.0
     material_shininess 76.8
-    fresnel_material 0.25, 2.97, 10.0
+    fresnel_material 0.35, 2.705, 10.0
 
 // -------------------------------------------------------------------------------------------------------------------
 //   WATER MATERIAL
@@ -678,7 +210,7 @@ ruby ->
     material_diffuse 0.61424, 0.04136, 0.04136, 0.55
     material_specular 0.727811, 0.626959, 0.626959, 0.55
     material_shininess 76.8
-    fresnel_material 0.7, 1.757, 0.01
+    fresnel_material 0.65, 1.757, 0.01
 
 // -------------------------------------------------------------------------------------------------------------------
 //   JADE MATERIAL
@@ -692,5 +224,5 @@ jade ->
     material_diffuse 0.54, 0.89, 0.63, 0.95
     material_specular 0.316228, 0.316228, 0.316228, 0.95
     material_shininess 12.8
-    fresnel_material 0.7, 1.640, 0.01
+    fresnel_material 0.7, 1.64, 10.0
 
