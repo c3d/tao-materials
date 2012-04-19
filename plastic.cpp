@@ -304,6 +304,7 @@ void Plastic::createShaders()
                 "**                                                                               \n"
                 "********************************************************************************/\n"
                 "varying float ratio;"
+                "varying vec4  color;"
 
                 "uniform vec3 camera;"
                 "uniform mat4 modelMatrix;"
@@ -335,6 +336,7 @@ void Plastic::createShaders()
 
                 "   vec3 eyePos = normalize(camera + viewDir);"
                 "   ratio = 0.5 * (1.0 + dot(eyePos, normal));"
+                "   color = gl_Color;"
                 "}";
 
             // If the extension is not available, use this fragment shader
@@ -357,7 +359,7 @@ void Plastic::createShaders()
                "varying vec4  color;"
                "void main()"
                "{"
-               "    gl_FragColor = vec4(ratio, 1.0) * color;"
+               "    gl_FragColor = vec4(ratio, ratio, ratio, 1.0) * color;"
                "}";
         }
 

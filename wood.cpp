@@ -408,7 +408,7 @@ void Wood::createShaders()
             }
             else
             {
-                std::cerr << "Error loading fragment shader code: " << "\n";
+                std::cerr << "Error loading fragment shader code : " << "\n";
                 std::cerr << pgm->log().toStdString();
             }
         }
