@@ -34,12 +34,9 @@ struct Material : public QObject
 
     // Draw material
     virtual void    Draw();
-
     // Re-create shaders if GL context has changed
     void            checkGLContext();
     virtual void    createShaders();
-
-    std::ostream &  debug();
 
     static void     render_callback(void *arg);
     static void     identify_callback(void *arg);
