@@ -87,14 +87,10 @@ void Material::checkGLContext()
 //   Re-create context-dependent resources if GL context has changed
 // ----------------------------------------------------------------------------
 {
-    tao->makeGLContextCurrent();
     if (*pcontext != QGLContext::currentContext())
     {
-        IFTRACE(materials)
-                debug() << "Context has changed" << "\n";
-
-        *pcontext = QGLContext::currentContext();
         createShaders();
+        *pcontext = QGLContext::currentContext();
     }
 }
 
@@ -105,13 +101,3 @@ void Material::createShaders()
 // ----------------------------------------------------------------------------
 {
 }
-
-std::ostream & Material::debug()
-// ----------------------------------------------------------------------------
-//   Convenience method to log with a common prefix
-// ----------------------------------------------------------------------------
-{
-    std::cerr << "[Materials] " << (void*)this << " ";
-    return std::cerr;
-}
-
