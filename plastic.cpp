@@ -37,9 +37,6 @@ Plastic::Plastic()
 // ----------------------------------------------------------------------------
     : Material(&context)
 {
-    IFTRACE(materials)
-            debug() << "Create plastic material" << "\n";
-
     checkGLContext();
 
     // Get model matrix
@@ -95,7 +92,6 @@ void Plastic::Draw()
     if (!licensed && !tao->blink(1.0, 0.2, 300.0))
         return;
 
-    tao->makeGLContextCurrent();
     checkGLContext();
 
     uint prg_id = 0;
@@ -104,9 +100,6 @@ void Plastic::Draw()
 
     if(prg_id)
     {
-        IFTRACE(materials)
-                debug() << "Apply plastic material" << "\n";
-
         // Set shader
         tao->SetShader(prg_id);
 
@@ -136,12 +129,7 @@ void Plastic::createShaders()
 {
     if(!failed)
     {
-        delete pgm;
-
-        IFTRACE(materials)
-                debug() << "Create plastic shader" << "\n";
-
-        pgm = new QGLShaderProgram(*pcontext);
+        pgm = new QGLShaderProgram();
         bool ok = false;
 
         static string vSrc;

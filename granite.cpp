@@ -37,9 +37,6 @@ Granite::Granite(uint unit, float scale)
 // ----------------------------------------------------------------------------
     : Material(&context), unit(unit), scale(scale)
 {
-    IFTRACE(materials)
-            debug() << "Create granite material" << "\n";
-
     checkGLContext();
 }
 
@@ -133,9 +130,6 @@ void Granite::Draw()
 
     if(prg_id)
     {
-        IFTRACE(materials)
-                debug() << "Apply granite material" << "\n";
-
         // Set shader
         tao->SetShader(prg_id);
 
@@ -163,12 +157,7 @@ void Granite::createShaders()
 {
     if(!failed)
     {
-        delete pgm;
-
-        IFTRACE(materials)
-                debug() << "Create granite shader" << "\n";
-
-        pgm = new QGLShaderProgram(*pcontext);
+        pgm = new QGLShaderProgram();
         bool ok = false;
 
         // Basic vertex shader
