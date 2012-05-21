@@ -111,6 +111,7 @@ void Wood::Draw()
     if (!licensed && !tao->blink(1.0, 0.2, 300.0))
         return;
 
+    tao->makeGLContextCurrent();
     checkGLContext();
 
     uint prg_id = 0;
@@ -148,7 +149,9 @@ void Wood::createShaders()
 {
     if(!failed)
     {
-        pgm = new QGLShaderProgram();
+        delete pgm;
+
+        pgm = new QGLShaderProgram(*pcontext);
         bool ok = false;
 
         // Basic vertex shader
