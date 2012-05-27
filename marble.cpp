@@ -37,9 +37,6 @@ Marble::Marble(uint unit, float scale)
 // ----------------------------------------------------------------------------
     : Material(&context), unit(unit), scale(scale)
 {
-    IFTRACE(materials)
-            debug() << "Create marble material" << "\n";
-
     checkGLContext();
 }
 
@@ -122,9 +119,6 @@ void Marble::Draw()
 
     if(prg_id)
     {
-        IFTRACE(materials)
-                debug() << "Apply marble material" << "\n";
-
         // Set shader
         tao->SetShader(prg_id);
 
@@ -151,12 +145,7 @@ void Marble::createShaders()
 {
     if(!failed)
     {
-        delete pgm;
-
-        IFTRACE(materials)
-                debug() << "Create marble shader" << "\n";
-
-        pgm = new QGLShaderProgram(*pcontext);
+        pgm = new QGLShaderProgram();
         bool ok = false;
 
         // Basic vertex shader
