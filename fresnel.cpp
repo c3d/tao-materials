@@ -38,9 +38,6 @@ Fresnel::Fresnel(uint unit, float IoR, float ratio, float roughness)
     : Material(&context),
       unit(unit), IoR(IoR), ratio(ratio), roughness(roughness)
 {
-    IFTRACE(materials)
-            debug() << "Create fresnel material" << "\n";
-
     checkGLContext();
 
     // Get model matrix
@@ -105,9 +102,6 @@ void Fresnel::Draw()
 
     if(prg_id)
     {
-        IFTRACE(materials)
-                debug() << "Apply fresnel material" << "\n";
-
         // Set shader
         tao->SetShader(prg_id);
 
@@ -143,12 +137,7 @@ void Fresnel::createShaders()
 {
     if(!failed)
     {
-        delete pgm;
-
-        IFTRACE(materials)
-                debug() << "Create fresnel shader" << "\n";
-
-        pgm = new QGLShaderProgram(*pcontext);
+        pgm = new QGLShaderProgram();
         bool ok = false;
 
         // Basic vertex shader
