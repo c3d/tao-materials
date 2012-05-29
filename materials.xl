@@ -11,7 +11,7 @@ module_description
     description "A module to add different materials in a scene."
     author "Taodyne SAS"
     website "http://www.taodyne.com"
-    version "1.0"
+    version 1.001
 
 module_description "fr",
     name "Matériaux"
