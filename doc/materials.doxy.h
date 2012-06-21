@@ -7,10 +7,6 @@
  * This module allows you to define and apply some useful materials on your different objects.
  * The following image shows a set of some defined materials.
  *
- * @code
-import Materials
- * @endcode
- *
  * @image html materials.png "Example of materials"
  *
  * @note Materials defined in this module are adapted for a basic usage.
@@ -26,10 +22,6 @@ import Materials
  * Ce module permet d'appliquer des matériaux à des objets 3D (plastique, marbre,
  * granit...).
  *
- * @code
-import Materials
- * @endcode
- *
  * @image html materials.png "Exemple de matériaux"
  *
  * @endtaomoduledescription{Materials}
@@ -41,14 +33,14 @@ import Materials
  * @~english
  * Defines a sort of plastic material.
  *
- * Set a sort of plastic material, whose color is defined by @p color.
+ * Set a sort of plastic material, whose color is defined by @ref graph.doxy.h::color(r:real,g:real,b:real,a:real).
  *
  * @note This material act as a simple texture.
  * @note There is no one reflection on this material.
  *
  * @~french
  * Active un matériau qui ressemble à du plastique mat.
- * La couleur est définie par @p color. Il n'y a aucune réflection sur ce
+ * La couleur est définie par @ref color. Il n'y a aucune réflection sur ce
  * matériau.
  */
 plastic();
@@ -286,7 +278,7 @@ wood(scale:real);
  * @param n indice of refraction of the material.
  * @param roughness roughness of the material. 0 define a fully transparent material and 10 a fully opaque one.
  *
- * @attention A @p cube_map has to be define previously in order to generate reflection/refraction effects.
+ * @attention A @ref cube_map has to be define previously in order to generate reflection/refraction effects.
  * @attention This material has to be apply just before the choosen object in order to be subject correctly to all its transformations.
  *
  * An example of use of this effect is described below
