@@ -7,6 +7,10 @@
  * This module allows you to define and apply some useful materials on your different objects.
  * The following image shows a set of some defined materials.
  *
+ * @code
+import Materials
+ * @endcode
+ *
  * @image html materials.png "Example of materials"
  *
  * @note Materials defined in this module are adapted for a basic usage.
@@ -21,6 +25,10 @@
  *
  * Ce module permet d'appliquer des matériaux à des objets 3D (plastique, marbre,
  * granit...).
+ *
+ * @code
+import Materials
+ * @endcode
  *
  * @image html materials.png "Exemple de matériaux"
  *
