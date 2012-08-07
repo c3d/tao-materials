@@ -16,8 +16,6 @@ include(../modules.pri)
 
 OTHER_FILES = materials.xl materials.tbl traces.tbl
 
-DEFINES     += GLEW_STATIC
-
 INCLUDEPATH += $${TAOTOPSRC}/tao/include/tao/
 HEADERS = \
     fresnel.h \
@@ -28,7 +26,7 @@ HEADERS = \
     granite.h \
     marble.h \
 
-SOURCES = $${TAOTOPSRC}/tao/include/tao/GL/glew.c \
+SOURCES = \
     fresnel.cpp \
     materials.cpp \
     material.cpp \
@@ -36,6 +34,11 @@ SOURCES = $${TAOTOPSRC}/tao/include/tao/GL/glew.c \
     wood.cpp \
     granite.cpp \
     marble.cpp \
+
+win32 {
+  DEFINES     += GLEW_STATIC
+  SOURCE      += $${TAOTOPSRC}/tao/include/tao/GL/glew.c
+}
 
 TBL_SOURCES  = materials.tbl
 
