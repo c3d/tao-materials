@@ -89,7 +89,7 @@ void Plastic::Draw()
 {
     if (!tested)
     {
-        licensed = tao->checkImpressOrLicense("Materials 1.003");
+        licensed = tao->checkImpressOrLicense("Materials 1.0");
         tested = true;
     }
 
