@@ -105,11 +105,9 @@ void Wood::Draw()
 {
     if (!tested)
     {
-        licensed = tao->checkImpressOrLicense("Materials 1.0");
+        licensed = tao->checkImpressOrLicense("Materials 1.003");
         tested = true;
     }
-    if (!licensed && !tao->blink(1.0, 0.2, 300.0))
-        return;
 
     tao->makeGLContextCurrent();
     checkGLContext();
