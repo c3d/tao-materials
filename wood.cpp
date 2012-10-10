@@ -105,7 +105,7 @@ void Wood::Draw()
 {
     if (!tested)
     {
-        licensed = tao->checkImpressOrLicense("Materials 1.004");
+        licensed = tao->checkImpressOrLicense("Materials 1.003");
         tested = true;
     }
 
