@@ -119,7 +119,7 @@ void Granite::Draw()
 {
     if (!tested)
     {
-        licensed = tao->checkImpressOrLicense("Materials 1.003");
+        licensed = tao->checkImpressOrLicense("Materials 1.004");
         tested = true;
     }
 
