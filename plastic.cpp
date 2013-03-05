@@ -20,8 +20,6 @@
 // ****************************************************************************
 #include "plastic.h"
 
-#define GL (*graphic_state)
-
 // ============================================================================
 //
 //   Plastic Material
@@ -111,19 +109,19 @@ void Plastic::Draw()
         tao->SetShader(prg_id);
 
         // Set uniform values
-        GL.UniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
+        glUniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
 
         // Get and set camera position
         Vector3 cam;
         tao->getCamera(&cam, NULL, NULL, NULL);
         GLfloat camera[3] = {cam.x, cam.y, cam.z};
-        GL.Uniform3fv(uniforms["camera"], 1, camera);
+        glUniform3fv(uniforms["camera"], 1, camera);
 
 
         if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
         {
             GLint lightsmask = tao->EnabledLights();
-            GL.Uniform(uniforms["lights"], lightsmask);
+            glUniform1i(uniforms["lights"], lightsmask);
         }
     }
 }
@@ -285,7 +283,7 @@ void Plastic::createShaders()
                 "   else"
                 "   {"
                 "       /* Define new render color */"
-                "       lighting_color = renderColor * color;"
+                "       lighting_color = renderColor;"
                 "   }"
 
                 "   return lighting_color;"
@@ -293,7 +291,7 @@ void Plastic::createShaders()
 
                 "void main()"
                 "{"
-                "   vec4 renderColor = vec4(ratio, ratio, ratio, 1.0);"
+                "   vec4 renderColor = vec4(ratio, ratio, ratio, 1.0) * color;"
                 "   gl_FragColor = computeRenderColor(renderColor);"
                 "}";
         }
@@ -371,7 +369,7 @@ void Plastic::createShaders()
                "varying vec4  color;"
                "void main()"
                "{"
-               "    gl_FragColor = vec4(ratio, ratio, ratio, 1.0);"
+               "    gl_FragColor = vec4(ratio, ratio, ratio, 1.0) * color;"
                "}";
         }
 

@@ -20,8 +20,6 @@
 // ****************************************************************************
 #include "marble.h"
 
-#define GL (*graphic_state)
-
 // ============================================================================
 //
 //   Marble Material
@@ -129,16 +127,16 @@ void Marble::Draw()
         tao->SetShader(prg_id);
 
         // Set uniform values
-        GL.Uniform(uniforms["noiseMap"], unit);
+        glUniform1i(uniforms["noiseMap"], unit);
 
-        GL.Uniform(uniforms["scale"], scale);
-        GL.Uniform3fv(uniforms["first_color"], 1, first_color);
-        GL.Uniform3fv(uniforms["second_color"], 1, second_color);
+        glUniform1f(uniforms["scale"], scale);
+        glUniform3fv(uniforms["first_color"], 1, first_color);
+        glUniform3fv(uniforms["second_color"], 1, second_color);
 
         if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
         {
             GLint lightsmask = tao->EnabledLights();
-            GL.Uniform(uniforms["lights"], lightsmask);
+            glUniform1i(uniforms["lights"], lightsmask);
         }
     }
 }
