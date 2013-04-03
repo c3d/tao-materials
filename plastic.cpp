@@ -285,7 +285,7 @@ void Plastic::createShaders()
                 "   else"
                 "   {"
                 "       /* Define new render color */"
-                "       lighting_color = renderColor;"
+                "       lighting_color = renderColor * color;"
                 "   }"
 
                 "   return lighting_color;"
@@ -293,7 +293,7 @@ void Plastic::createShaders()
 
                 "void main()"
                 "{"
-                "   vec4 renderColor = vec4(ratio, ratio, ratio, 1.0) * color;"
+                "   vec4 renderColor = vec4(ratio, ratio, ratio, 1.0);"
                 "   gl_FragColor = computeRenderColor(renderColor);"
                 "}";
         }
@@ -371,7 +371,7 @@ void Plastic::createShaders()
                "varying vec4  color;"
                "void main()"
                "{"
-               "    gl_FragColor = vec4(ratio, ratio, ratio, 1.0) * color;"
+               "    gl_FragColor = vec4(ratio, ratio, ratio, 1.0);"
                "}";
         }
 
