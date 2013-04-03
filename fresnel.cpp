@@ -20,6 +20,8 @@
 // ****************************************************************************
 #include "fresnel.h"
 
+#define GL (*graphic_state)
+
 // ============================================================================
 //
 //   Fresnel Material
@@ -113,22 +115,22 @@ void Fresnel::Draw()
         tao->HasPixelBlur(true);
 
         // Set uniform values
-        glUniform1i(uniforms["environmentMap"], unit);
-        glUniform1f(uniforms["IoR"], IoR);
-        glUniform1f(uniforms["ratio"], ratio);
-        glUniform1f(uniforms["roughness"], roughness);
-        glUniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
+        GL.Uniform(uniforms["environmentMap"], unit);
+        GL.Uniform(uniforms["IoR"], IoR);
+        GL.Uniform(uniforms["ratio"], ratio);
+        GL.Uniform(uniforms["roughness"], roughness);
+        GL.UniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
 
         // Get and set camera position
         Vector3 cam;
         tao->getCamera(&cam, NULL, NULL, NULL);
         GLfloat camera[3] = {cam.x, cam.y, cam.z};
-        glUniform3fv(uniforms["camera"], 1, camera);
+        GL.Uniform3fv(uniforms["camera"], 1, camera);
 
         if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
         {
             GLint lightsmask = tao->EnabledLights();
-            glUniform1i(uniforms["lights"], lightsmask);
+            GL.Uniform(uniforms["lights"], lightsmask);
         }
     }
 }
