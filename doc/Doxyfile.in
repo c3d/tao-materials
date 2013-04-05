@@ -1,5 +1,5 @@
 @INCLUDE = ../../Doxyfile
 PROJECT_NAME = \"Materials\"
-PROJECT_NUMBER = 1.006
-QHP_NAMESPACE = com.taodyne.TaoPresentations.modules.Materials.1.006
+PROJECT_NUMBER = 1.004
+QHP_NAMESPACE = com.taodyne.TaoPresentations.modules.Materials.1.004
 QHP_VIRTUAL_FOLDER = Materials

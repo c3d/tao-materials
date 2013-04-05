@@ -20,6 +20,8 @@
 // ****************************************************************************
 #include "plastic.h"
 
+#define GL (*graphic_state)
+
 // ============================================================================
 //
 //   Plastic Material
@@ -87,6 +89,13 @@ void Plastic::Draw()
 //   Apply plastic material
 // ----------------------------------------------------------------------------
 {
+    if (!tested)
+    {
+        licensed = tao->checkImpressOrLicense("Materials 1.004");
+        tested = true;
+    }
+
+    tao->makeGLContextCurrent();
     checkGLContext();
 
     uint prg_id = 0;
@@ -102,19 +111,19 @@ void Plastic::Draw()
         tao->SetShader(prg_id);
 
         // Set uniform values
-        glUniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
+        GL.UniformMatrix4fv(uniforms["modelMatrix"], 1, 0, &model[0][0]);
 
         // Get and set camera position
         Vector3 cam;
         tao->getCamera(&cam, NULL, NULL, NULL);
-        GLfloat camera[3] = { (float) cam.x, (float) cam.y, (float) cam.z};
-        glUniform3fv(uniforms["camera"], 1, camera);
+        GLfloat camera[3] = {cam.x, cam.y, cam.z};
+        GL.Uniform3fv(uniforms["camera"], 1, camera);
 
 
         if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
         {
             GLint lightsmask = tao->EnabledLights();
-            glUniform1i(uniforms["lights"], lightsmask);
+            GL.Uniform(uniforms["lights"], lightsmask);
         }
     }
 }
@@ -276,7 +285,7 @@ void Plastic::createShaders()
                 "   else"
                 "   {"
                 "       /* Define new render color */"
-                "       lighting_color = renderColor;"
+                "       lighting_color = renderColor * color;"
                 "   }"
 
                 "   return lighting_color;"
@@ -284,7 +293,7 @@ void Plastic::createShaders()
 
                 "void main()"
                 "{"
-                "   vec4 renderColor = vec4(ratio, ratio, ratio, 1.0) * color;"
+                "   vec4 renderColor = vec4(ratio, ratio, ratio, 1.0);"
                 "   gl_FragColor = computeRenderColor(renderColor);"
                 "}";
         }
@@ -362,7 +371,7 @@ void Plastic::createShaders()
                "varying vec4  color;"
                "void main()"
                "{"
-               "    gl_FragColor = vec4(ratio, ratio, ratio, 1.0) * color;"
+               "    gl_FragColor = vec4(ratio, ratio, ratio, 1.0);"
                "}";
         }
 

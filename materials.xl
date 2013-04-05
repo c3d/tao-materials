@@ -11,21 +11,13 @@ module_description
     description "A module to add different materials in a scene."
     author "Taodyne SAS"
     website "http://www.taodyne.com"
-    version 1.005
+    version 1.004
 
 module_description "fr",
     name "Matériaux"
     description "Permet d'appliquer différents matériaux sur des objets présent dans une scène."
 
 import Mapping 1.0
-
-// -------------------------------------------------------------------------------------------------------------------
-//   PLASTIC MATERIAL
-// -------------------------------------------------------------------------------------------------------------------
-
-plastic ->
-    // Apply basic plastic material (Avoid bug with tbl files).
-    plastic 0.0
 
 // -------------------------------------------------------------------------------------------------------------------
 //   MARBLE MATERIAL
