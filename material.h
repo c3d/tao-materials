@@ -21,7 +21,6 @@
 
 #include "tao/coords3d.h"
 #include "tao/module_api.h"
-#include "tao/graphic_state.h"
 #include "tao/tao_gl.h"
 #include <QObject>
 
@@ -50,6 +49,8 @@ public:
     const QGLContext    **pcontext;
 
 public:
+    static bool tested, licensed;
+
     // Pointer to Tao functions
     static const Tao::ModuleApi *tao;
 };
