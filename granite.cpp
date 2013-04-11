@@ -20,8 +20,6 @@
 // ****************************************************************************
 #include "granite.h"
 
-#define GL (*graphic_state)
-
 // ============================================================================
 //
 //   Granite Material
@@ -119,6 +117,12 @@ void Granite::Draw()
 //   Apply granite material
 // ----------------------------------------------------------------------------
 {
+    if (!tested)
+    {
+        licensed = tao->checkImpressOrLicense("Materials 1.004");
+        tested = true;
+    }
+
     checkGLContext();
 
     uint prg_id = 0;
@@ -134,17 +138,17 @@ void Granite::Draw()
         tao->SetShader(prg_id);
 
         // Set uniform values
-        GL.Uniform(uniforms["noiseMap"], unit);
+        glUniform1i(uniforms["noiseMap"], unit);
 
-        GL.Uniform(uniforms["scale"], scale);
-        GL.Uniform3fv(uniforms["first_color"], 1, first_color);
-        GL.Uniform3fv(uniforms["second_color"], 1, second_color);
-        GL.Uniform3fv(uniforms["third_color"], 1, third_color);
+        glUniform1f(uniforms["scale"], scale);
+        glUniform3fv(uniforms["first_color"], 1, first_color);
+        glUniform3fv(uniforms["second_color"], 1, second_color);
+        glUniform3fv(uniforms["third_color"], 1, third_color);
 
         if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
         {
-            GLint lightsmask =  GL.LightsMask();
-            GL.Uniform(uniforms["lights"], lightsmask);
+            GLint lightsmask = tao->EnabledLights();
+            glUniform1i(uniforms["lights"], lightsmask);
         }
     }
 }
