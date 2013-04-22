@@ -112,7 +112,7 @@ void Fresnel::Draw()
         tao->SetShader(prg_id);
 
         // Activate pixel blur
-        tao->HasPixelBlur(true);
+        GL.HasPixelBlur(true);
 
         // Set uniform values
         GL.Uniform(uniforms["environmentMap"], unit);
