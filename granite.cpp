@@ -117,12 +117,6 @@ void Granite::Draw()
 //   Apply granite material
 // ----------------------------------------------------------------------------
 {
-    if (!tested)
-    {
-        licensed = tao->checkImpressOrLicense("Materials 1.004");
-        tested = true;
-    }
-
     checkGLContext();
 
     uint prg_id = 0;

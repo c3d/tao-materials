@@ -106,12 +106,6 @@ void Marble::Draw()
 //   Apply marble material
 // ----------------------------------------------------------------------------
 {
-    if (!tested)
-    {
-        licensed = tao->checkImpressOrLicense("Materials 1.004");
-        tested = true;
-    }
-
     checkGLContext();
 
     uint prg_id = 0;

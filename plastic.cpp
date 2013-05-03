@@ -87,12 +87,6 @@ void Plastic::Draw()
 //   Apply plastic material
 // ----------------------------------------------------------------------------
 {
-    if (!tested)
-    {
-        licensed = tao->checkImpressOrLicense("Materials 1.004");
-        tested = true;
-    }
-
     tao->makeGLContextCurrent();
     checkGLContext();
 

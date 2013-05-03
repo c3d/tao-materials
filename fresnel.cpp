@@ -89,12 +89,6 @@ void Fresnel::Draw()
 //   Apply fresnel material
 // ----------------------------------------------------------------------------
 {
-    if (!tested)
-    {
-        licensed = tao->checkImpressOrLicense("Materials 1.004");
-        tested = true;
-    }
-
     checkGLContext();
 
     uint prg_id = 0;

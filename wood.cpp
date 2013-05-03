@@ -103,12 +103,6 @@ void Wood::Draw()
 //   Apply wood material
 // ----------------------------------------------------------------------------
 {
-    if (!tested)
-    {
-        licensed = tao->checkImpressOrLicense("Materials 1.004");
-        tested = true;
-    }
-
     tao->makeGLContextCurrent();
     checkGLContext();
 
