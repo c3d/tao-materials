@@ -87,7 +87,6 @@ void Plastic::Draw()
 //   Apply plastic material
 // ----------------------------------------------------------------------------
 {
-    tao->makeGLContextCurrent();
     checkGLContext();
 
     uint prg_id = 0;

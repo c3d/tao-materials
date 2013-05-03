@@ -103,7 +103,6 @@ void Wood::Draw()
 //   Apply wood material
 // ----------------------------------------------------------------------------
 {
-    tao->makeGLContextCurrent();
     checkGLContext();
 
     uint prg_id = 0;
