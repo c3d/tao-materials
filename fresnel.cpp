@@ -91,7 +91,7 @@ void Fresnel::Draw()
 {
     if (!tested)
     {
-        licensed = tao->checkImpressOrLicense("Materials 1.004");
+        licensed = tao->checkImpressOrLicense("Materials 1.005");
         tested = true;
     }
 
