@@ -114,7 +114,7 @@ void Plastic::Draw()
         // Get and set camera position
         Vector3 cam;
         tao->getCamera(&cam, NULL, NULL, NULL);
-        GLfloat camera[3] = { (float) cam.x, (float) cam.y, (float) cam.z};
+        GLfloat camera[3] = {cam.x, cam.y, cam.z};
         glUniform3fv(uniforms["camera"], 1, camera);
 
 
