@@ -25,6 +25,9 @@ const Tao::ModuleApi *Material::tao = NULL;
 bool Material::tested = false;
 bool Material::licensed = false;
 
+
+DLL_PUBLIC Tao::GraphicState * graphic_state = NULL;
+
 // ============================================================================
 //
 //    Material

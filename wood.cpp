@@ -20,6 +20,8 @@
 // ****************************************************************************
 #include "wood.h"
 
+#define GL (*graphic_state)
+
 // ============================================================================
 //
 //   Wood Material
@@ -122,19 +124,19 @@ void Wood::Draw()
         tao->SetShader(prg_id);
 
         // Set uniform values
-        glUniform1i(uniforms["noiseMap"], unit);
+        GL.Uniform(uniforms["noiseMap"], unit);
 
-        glUniform1f(uniforms["scale"], scale);
-        glUniform1f(uniforms["ringSize"], ring);
-        glUniform1f(uniforms["noiseRatio"], noise);
+        GL.Uniform(uniforms["scale"], scale);
+        GL.Uniform(uniforms["ringSize"], ring);
+        GL.Uniform(uniforms["noiseRatio"], noise);
 
-        glUniform3fv(uniforms["first_color"], 1, first_color);
-        glUniform3fv(uniforms["second_color"], 1, second_color);
+        GL.Uniform3fv(uniforms["first_color"], 1, first_color);
+        GL.Uniform3fv(uniforms["second_color"], 1, second_color);
 
         if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
         {
             GLint lightsmask = tao->EnabledLights();
-            glUniform1i(uniforms["lights"], lightsmask);
+            GL.Uniform(uniforms["lights"], lightsmask);
         }
     }
 }
