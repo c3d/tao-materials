@@ -279,7 +279,7 @@ void Plastic::createShaders()
                 "       }"
 
                 "       /* Define new render color */"
-                "       lighting_color  = (ambient + diffuse) * renderColor + specular;"
+                "       lighting_color  = (ambient + diffuse) * renderColor * color + specular;"
                 "   }"
                 "   else"
                 "   {"
