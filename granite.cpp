@@ -149,7 +149,7 @@ void Granite::Draw()
 
         if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
         {
-            GLint lightsmask = tao->EnabledLights();
+            GLint lightsmask =  GL.LightsMask();
             GL.Uniform(uniforms["lights"], lightsmask);
         }
     }
