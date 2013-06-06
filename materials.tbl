@@ -24,8 +24,9 @@
 //   PLASTIC MATERIAL
 // ----------------------------------------------------------------------------
 
-PREFIX(Plastic,  tree, "plastic",,
-       return plastic(self),
+PREFIX(PlasticMaterial,  tree, "plastic",
+       PARM(a, real, ),
+       return plastic(self, a),
        GROUP(module.Materials)
        SYNOPSIS("Apply a sort of plastic material")
        DESCRIPTION("Apply a sort of plastic material"))
