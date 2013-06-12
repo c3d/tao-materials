@@ -22,9 +22,6 @@
 
 const Tao::ModuleApi *Material::tao = NULL;
 
-bool Material::tested = false;
-bool Material::licensed = false;
-
 // ============================================================================
 //
 //    Material
