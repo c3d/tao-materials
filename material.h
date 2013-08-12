@@ -21,6 +21,7 @@
 
 #include "tao/coords3d.h"
 #include "tao/module_api.h"
+#include "tao/graphic_state.h"
 #include "tao/tao_gl.h"
 #include <QObject>
 

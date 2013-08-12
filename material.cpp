@@ -22,6 +22,10 @@
 
 const Tao::ModuleApi *Material::tao = NULL;
 
+
+DLL_PUBLIC Tao::GraphicState * graphic_state = NULL;
+
+
 // ============================================================================
 //
 //    Material
