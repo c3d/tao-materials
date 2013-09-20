@@ -128,7 +128,6 @@ void Marble::Draw()
         GL.Uniform(uniforms["scale"], scale);
         GL.Uniform3fv(uniforms["first_color"], 1, first_color);
         GL.Uniform3fv(uniforms["second_color"], 1, second_color);
-        GL.Uniform(uniforms["unit"], (GL.ActiveTextureUnitIndex() - GL_TEXTURE0));
 
         if(tao->isGLExtensionAvailable("GL_EXT_gpu_shader4"))
         {
@@ -171,7 +170,6 @@ void Marble::createShaders()
                 "********************************************************************************/\n"
                 "varying vec3 viewDir;"
                 "varying vec3 normal;"
-                "uniform int unit;"
 
                 "uniform float scale;"
                 "void main()"
@@ -180,14 +178,7 @@ void Marble::createShaders()
                 "   gl_Position = ftransform();"
 
                 "   /* Compute texture coordinates */"
-                "   if(unit == 0)"
-                "       gl_TexCoord[0] = (scale * gl_TextureMatrix[0] * gl_MultiTexCoord0);"
-                "   else if(unit == 1)"
-                "       gl_TexCoord[0] = (scale * gl_TextureMatrix[1] * gl_MultiTexCoord1);"
-                "   else if(unit == 2)"
-                "       gl_TexCoord[0] = (scale * gl_TextureMatrix[2] * gl_MultiTexCoord2);"
-                "   else if(unit == 3)"
-                "       gl_TexCoord[0] = (scale * gl_TextureMatrix[3] * gl_MultiTexCoord3);"
+                "   gl_TexCoord[0] = (scale * gl_Vertex) / 100.0;"
 
                 "   /* Compute world position and normal */"
                 "   normal  = gl_NormalMatrix * gl_Normal;"
@@ -220,7 +211,6 @@ void Marble::createShaders()
                "uniform sampler3D noiseMap;"
 
                "uniform int       lights;"
-               "uniform int       unit;"
 
                "varying vec3 viewDir;"
                "varying vec3 normal;"
@@ -358,7 +348,6 @@ void Marble::createShaders()
                "uniform vec3      third_color;"
 
                "uniform sampler3D noiseMap;"
-               "uniform int       unit;"
 
                "varying vec3 viewDir;"
                "varying vec3 normal;"
@@ -460,7 +449,6 @@ void Marble::createShaders()
             uint id = pgm->programId();
 
             uniforms["scale"] = glGetUniformLocation(id, "scale");
-            uniforms["unit"] = glGetUniformLocation(id, "unit");
             uniforms["lights"] = glGetUniformLocation(id, "lights");
             uniforms["noiseMap"] = glGetUniformLocation(id, "noiseMap");
             uniforms["first_color"] = glGetUniformLocation(id, "first_color");
