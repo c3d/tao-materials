@@ -122,7 +122,6 @@ void Wood::Draw()
         GL.Uniform(uniforms["scale"], scale);
         GL.Uniform(uniforms["ringSize"], ring);
         GL.Uniform(uniforms["noiseRatio"], noise);
-        GL.Uniform(uniforms["unit"], (GL.ActiveTextureUnitIndex() - GL_TEXTURE0));
 
         GL.Uniform3fv(uniforms["first_color"], 1, first_color);
         GL.Uniform3fv(uniforms["second_color"], 1, second_color);
@@ -166,7 +165,6 @@ void Wood::createShaders()
                 "varying vec3 viewDir;"
                 "varying vec3 normal;"
 
-                "uniform int unit;"
                 "uniform float scale;"
                 "void main()"
                 "{"
@@ -174,14 +172,7 @@ void Wood::createShaders()
                 "   gl_Position = ftransform();"
 
                 "   /* Compute texture coordinates */"
-                "   if(unit == 0)"
-                "       gl_TexCoord[0] = (scale * gl_TextureMatrix[0] * gl_MultiTexCoord0);"
-                "   else if(unit == 1)"
-                "       gl_TexCoord[0] = (scale * gl_TextureMatrix[1] * gl_MultiTexCoord1);"
-                "   else if(unit == 2)"
-                "       gl_TexCoord[0] = (scale * gl_TextureMatrix[2] * gl_MultiTexCoord2);"
-                "   else if(unit == 3)"
-                "       gl_TexCoord[0] = (scale * gl_TextureMatrix[3] * gl_MultiTexCoord3);"
+                "   gl_TexCoord[0] = (scale * gl_Vertex) / 100.0;"
 
                 "   /* Compute world position and normal */"
                 "   normal  = gl_NormalMatrix * gl_Normal;"
@@ -215,7 +206,6 @@ void Wood::createShaders()
                "uniform float     noiseRatio;"
                "uniform float     ringSize;"
 
-               "uniform int       unit;"
                "uniform int       lights;"
 
                "varying vec3 viewDir;"
@@ -345,7 +335,6 @@ void Wood::createShaders()
                "uniform sampler3D noiseMap;"
                "uniform float     noiseRatio;"
                "uniform float     ringSize;"
-               "uniform int       unit;"
 
                "varying vec3 viewDir;"
                "varying vec3 normal;"
@@ -437,7 +426,6 @@ void Wood::createShaders()
             // Save uniform locations
             uint id = pgm->programId();
 
-            uniforms["unit"] = glGetUniformLocation(id, "unit");
             uniforms["scale"] = glGetUniformLocation(id, "scale");
             uniforms["lights"] = glGetUniformLocation(id, "lights");
             uniforms["ringSize"] = glGetUniformLocation(id, "ringSize");
