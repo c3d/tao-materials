@@ -1,8 +1,7 @@
 /**
  * @~english
  * @taomoduledescription{Materials, Materials}
- *
- * <tt>import Materials</tt> - Define some useful materials.
+ * <tt>import Materials</tt> - Define some useful materials.@n
  *
  * This module allows you to define and apply some useful materials on your different objects.
  * The following image shows a set of some defined materials.
@@ -20,8 +19,7 @@ import Materials
  * @endtaomoduledescription{Materials}
  * @~french
  * @taomoduledescription{Materials, Matériaux}
- *
- * <tt>import Materials</tt> - Définit des matériaux usuels.
+ * <tt>import Materials</tt> - Définit des matériaux usuels.@n
  *
  * Ce module permet d'appliquer des matériaux à des objets 3D (plastique, marbre,
  * granit...).

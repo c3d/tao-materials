@@ -11,7 +11,7 @@ module_description
     description "A module to add different materials in a scene."
     author "Taodyne SAS"
     website "http://www.taodyne.com"
-    version 1.005
+    version 1.007
 
 module_description "fr",
     name "Matériaux"
@@ -200,9 +200,9 @@ emerald ->
     /**
     * Define a sort of emerald material.
     **/
-    material_ambient 0.0215, 0.1745, 0.0215, 0.55
-    material_diffuse 0.07568, 0.61424, 0.07568, 0.55
-    material_specular 0.633, 0.727811, 0.633, 0.55
+    material_ambient 0.0215, 0.1745, 0.0215, 1.0
+    material_diffuse 0.07568, 0.61424, 0.07568, 1.0
+    material_specular 0.633, 0.727811, 0.633, 1.0
     material_shininess 76.8
     fresnel_material 0.65, 1.56, 0.01
 
@@ -214,9 +214,9 @@ ruby ->
     /**
     * Define a sort of ruby material.
     **/
-    material_ambient 0.1745, 0.01175, 0.01175, 0.55
-    material_diffuse 0.61424, 0.04136, 0.04136, 0.55
-    material_specular 0.727811, 0.626959, 0.626959, 0.55
+    material_ambient 0.1745, 0.01175, 0.01175, 1.0
+    material_diffuse 0.61424, 0.04136, 0.04136, 1.0
+    material_specular 0.727811, 0.626959, 0.626959, 1.0
     material_shininess 76.8
     fresnel_material 0.65, 1.757, 0.01
 
@@ -228,9 +228,9 @@ jade ->
     /**
     * Define a sort of jade material.
     **/
-    material_ambient 0.135, 0.2225, 0.1575, 0.95
-    material_diffuse 0.54, 0.89, 0.63, 0.95
-    material_specular 0.316228, 0.316228, 0.316228, 0.95
+    material_ambient 0.135, 0.2225, 0.1575, 1.0
+    material_diffuse 0.54, 0.89, 0.63, 1.0
+    material_specular 0.316228, 0.316228, 0.316228, 1.0
     material_shininess 12.8
     fresnel_material 0.7, 1.64, 10.0
 
