@@ -20,7 +20,6 @@
 // ****************************************************************************
 #include "fresnel.h"
 
-#define GL (*graphic_state)
 
 // ============================================================================
 //
@@ -485,13 +484,13 @@ void Fresnel::createShaders()
             // Save uniform locations
             uint id = pgm->programId();
 
-            uniforms["IoR"] = glGetUniformLocation(id, "IoR");
-            uniforms["ratio"] = glGetUniformLocation(id, "ratio");
-            uniforms["lights"] = glGetUniformLocation(id, "lights");
-            uniforms["roughness"] = glGetUniformLocation(id, "roughness");
-            uniforms["environmentMap"] = glGetUniformLocation(id, "environmentMap");
-            uniforms["camera"] = glGetUniformLocation(id, "camera");
-            uniforms["modelMatrix"] = glGetUniformLocation(id, "modelMatrix");
+            uniforms["IoR"] = GL.GetUniformLocation(id, "IoR");
+            uniforms["ratio"] = GL.GetUniformLocation(id, "ratio");
+            uniforms["lights"] = GL.GetUniformLocation(id, "lights");
+            uniforms["roughness"] = GL.GetUniformLocation(id, "roughness");
+            uniforms["environmentMap"] = GL.GetUniformLocation(id, "environmentMap");
+            uniforms["camera"] = GL.GetUniformLocation(id, "camera");
+            uniforms["modelMatrix"] = GL.GetUniformLocation(id, "modelMatrix");
         }
     }
 }

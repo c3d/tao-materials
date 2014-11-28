@@ -20,7 +20,6 @@
 // ****************************************************************************
 #include "wood.h"
 
-#define GL (*graphic_state)
 
 // ============================================================================
 //
@@ -437,14 +436,14 @@ void Wood::createShaders()
             // Save uniform locations
             uint id = pgm->programId();
 
-            uniforms["unit"] = glGetUniformLocation(id, "unit");
-            uniforms["scale"] = glGetUniformLocation(id, "scale");
-            uniforms["lights"] = glGetUniformLocation(id, "lights");
-            uniforms["ringSize"] = glGetUniformLocation(id, "ringSize");
-            uniforms["noiseMap"] = glGetUniformLocation(id, "noiseMap");
-            uniforms["noiseRatio"] = glGetUniformLocation(id, "noiseRatio");
-            uniforms["first_color"] = glGetUniformLocation(id, "first_color");
-            uniforms["second_color"] = glGetUniformLocation(id, "second_color");
+            uniforms["unit"] = GL.GetUniformLocation(id, "unit");
+            uniforms["scale"] = GL.GetUniformLocation(id, "scale");
+            uniforms["lights"] = GL.GetUniformLocation(id, "lights");
+            uniforms["ringSize"] = GL.GetUniformLocation(id, "ringSize");
+            uniforms["noiseMap"] = GL.GetUniformLocation(id, "noiseMap");
+            uniforms["noiseRatio"] = GL.GetUniformLocation(id, "noiseRatio");
+            uniforms["first_color"] = GL.GetUniformLocation(id, "first_color");
+            uniforms["second_color"] = GL.GetUniformLocation(id, "second_color");
         }
     }
 }

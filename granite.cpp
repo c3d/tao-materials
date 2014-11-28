@@ -20,7 +20,6 @@
 // ****************************************************************************
 #include "granite.h"
 
-#define GL (*graphic_state)
 
 // ============================================================================
 //
@@ -477,13 +476,13 @@ void Granite::createShaders()
             // Save uniform locations
             uint id = pgm->programId();
 
-            uniforms["unit"] = glGetUniformLocation(id, "unit");
-            uniforms["scale"] = glGetUniformLocation(id, "scale");
-            uniforms["lights"] = glGetUniformLocation(id, "lights");
-            uniforms["noiseMap"] = glGetUniformLocation(id, "noiseMap");
-            uniforms["first_color"] = glGetUniformLocation(id, "first_color");
-            uniforms["second_color"] = glGetUniformLocation(id, "second_color");
-            uniforms["third_color"] = glGetUniformLocation(id, "third_color");
+            uniforms["unit"] = GL.GetUniformLocation(id, "unit");
+            uniforms["scale"] = GL.GetUniformLocation(id, "scale");
+            uniforms["lights"] = GL.GetUniformLocation(id, "lights");
+            uniforms["noiseMap"] = GL.GetUniformLocation(id, "noiseMap");
+            uniforms["first_color"] = GL.GetUniformLocation(id, "first_color");
+            uniforms["second_color"] = GL.GetUniformLocation(id, "second_color");
+            uniforms["third_color"] = GL.GetUniformLocation(id, "third_color");
         }
     }
 }

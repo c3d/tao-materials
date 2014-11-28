@@ -20,7 +20,6 @@
 // ****************************************************************************
 #include "plastic.h"
 
-#define GL (*graphic_state)
 
 // ============================================================================
 //
@@ -397,9 +396,9 @@ void Plastic::createShaders()
             // Save uniform locations
             uint id = pgm->programId();
 
-            uniforms["lights"] = glGetUniformLocation(id, "lights");
-            uniforms["camera"] = glGetUniformLocation(id, "camera");
-            uniforms["modelMatrix"] = glGetUniformLocation(id, "modelMatrix");
+            uniforms["lights"] = GL.GetUniformLocation(id, "lights");
+            uniforms["camera"] = GL.GetUniformLocation(id, "camera");
+            uniforms["modelMatrix"] = GL.GetUniformLocation(id, "modelMatrix");
         }
     }
 }

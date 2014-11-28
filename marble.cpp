@@ -20,7 +20,6 @@
 // ****************************************************************************
 #include "marble.h"
 
-#define GL (*graphic_state)
 
 // ============================================================================
 //
@@ -459,12 +458,12 @@ void Marble::createShaders()
             // Save uniform locations
             uint id = pgm->programId();
 
-            uniforms["scale"] = glGetUniformLocation(id, "scale");
-            uniforms["unit"] = glGetUniformLocation(id, "unit");
-            uniforms["lights"] = glGetUniformLocation(id, "lights");
-            uniforms["noiseMap"] = glGetUniformLocation(id, "noiseMap");
-            uniforms["first_color"] = glGetUniformLocation(id, "first_color");
-            uniforms["second_color"] = glGetUniformLocation(id, "second_color");
+            uniforms["scale"] = GL.GetUniformLocation(id, "scale");
+            uniforms["unit"] = GL.GetUniformLocation(id, "unit");
+            uniforms["lights"] = GL.GetUniformLocation(id, "lights");
+            uniforms["noiseMap"] = GL.GetUniformLocation(id, "noiseMap");
+            uniforms["first_color"] = GL.GetUniformLocation(id, "first_color");
+            uniforms["second_color"] = GL.GetUniformLocation(id, "second_color");
         }
     }
 }
