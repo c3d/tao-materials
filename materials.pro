@@ -35,11 +35,6 @@ SOURCES = \
     granite.cpp \
     marble.cpp \
 
-win32 {
-  DEFINES     += GLEW_STATIC
-  SOURCES     += $${TAOTOPSRC}/tao/include/tao/GL/glew.c
-}
-
 TBL_SOURCES  = materials.tbl
 
 QT          += core \
