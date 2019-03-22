@@ -1,8 +1,8 @@
-// ****************************************************************************
-//  materials.cpp                                                   Tao project
-// ****************************************************************************
+// *****************************************************************************
+// materials.cpp                                                   Tao3D project
+// *****************************************************************************
 //
-//   File Description:
+// File description:
 //
 //     Implementation of the XL primitives for the "materials" module.
 //
@@ -11,12 +11,30 @@
 //
 //
 //
-// ****************************************************************************
-// This software is licensed under the GNU General Public License v3.
-// See file COPYING for details.
-//  (C) 2011 Baptiste Soulisse <baptiste.soulisse@taodyne.com>
-//  (C) 2011 Taodyne SAS
-// ****************************************************************************
+// *****************************************************************************
+// This software is licensed under the GNU General Public License v3
+// (C) 2011,2013, Baptiste Soulisse <baptiste.soulisse@taodyne.com>
+// (C) 2011,2013, Catherine Burvelle <catherine@taodyne.com>
+// (C) 2011-2014,2019, Christophe de Dinechin <christophe@dinechin.org>
+// (C) 2011,2013, Jérôme Forissier <jerome@taodyne.com>
+// (C) 2011,2013, Baptiste Soulisse <baptiste.soulisse@taodyne.com>
+// *****************************************************************************
+// This file is part of Tao3D
+//
+// Tao3D is free software: you can r redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Tao3D is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Tao3D, in a file named COPYING.
+// If not, see <https://www.gnu.org/licenses/>.
+// *****************************************************************************
 
 #include "materials.h"
 #include <iostream>
@@ -40,9 +58,9 @@ static GLfloat secondWoodColor[3] = {0.44, 0.21, 0.0};
 
 
 // ============================================================================
-// 
+//
 //   PLASTIC MATERIAL
-// 
+//
 // ============================================================================
 
 Tree_p plastic(Tree_p, float)
@@ -60,9 +78,9 @@ Tree_p plastic(Tree_p, float)
 
 
 // ============================================================================
-// 
+//
 //   MARBLE MATERIAL
-// 
+//
 // ============================================================================
 
 Tree_p marble_first_color(Tree_p, float r, float g, float b)
@@ -108,9 +126,9 @@ Tree_p marble(Tree_p, uint unit, float scale)
 
 
 // ============================================================================
-// 
+//
 //   GRANITE MATERIAL
-// 
+//
 // ============================================================================
 
 Tree_p granite_first_color(Tree_p, float r, float g, float b)
@@ -170,9 +188,9 @@ Tree_p granite(Tree_p, uint unit, float scale)
 
 
 // ============================================================================
-// 
+//
 //   WOOD MATERIAL
-// 
+//
 // ============================================================================
 
 Tree_p wood_first_color(Tree_p, float r, float g, float b)
@@ -219,9 +237,9 @@ Tree_p wood(Tree_p, uint unit, float scale, float ring, float noise)
 
 
 // ============================================================================
-// 
+//
 //   FRESNEL MATERIAL
-// 
+//
 // ============================================================================
 
 Tree_p fresnel_material(Tree_p, uint unit,
@@ -229,7 +247,7 @@ Tree_p fresnel_material(Tree_p, uint unit,
 // ----------------------------------------------------------------------------
 //   Define fresnel material
 // ----------------------------------------------------------------------------
-{       
+{
     Fresnel* fresnel = new Fresnel(unit, IoR, ratio, roughness);
 
     Material::tao->AddToLayout2(Fresnel::render_callback,
